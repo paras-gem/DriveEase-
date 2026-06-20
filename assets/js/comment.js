@@ -20,6 +20,7 @@
  * │   └── sidebar.php              # Back-end admin panel sidebar frame
  * ├── public/                      # [EMPTY BY DESIGN]: Avoided nested directory structures
  * │                                # to keep server file system pathways direct and robust.
+ * ├── index.php                    # Server entry point (redirects to login)
  * ├── dashboard.php                # Authenticated landing page environment
  * ├── database.sql                 # Repository replica of current database schemas
  * ├── fetch-fleet.php              # Standard fallback PHP server-side data fetching module
