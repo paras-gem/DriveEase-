@@ -13,7 +13,8 @@ header('Content-Type: application/json');
 try {
     // createing statement to get the data from the table  
 
-    $sql = "SELECT  FROM vehicles";
+    
+$stmt = $pdo->query("SELECT * FROM vehicles");
 
     // Execute statement
 
