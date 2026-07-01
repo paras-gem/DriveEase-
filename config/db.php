@@ -5,7 +5,7 @@
 // database info
 
 $host = 'sql302.infinityfree.com';
-$db = 'if0_42220998_XXX';
+$db = 'if0_42220998_driveease_db';
 $user = 'if0_42220998';
 $pass = 'GDrive2026';
 
