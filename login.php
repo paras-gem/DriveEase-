@@ -1,29 +1,19 @@
-<?php
-
-require_once('../config/db.php');
-
-// when the session start
-session_start();
-header('Content-Type: application/json');
-
-// defining request method
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    // inputs 
-
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    try {
-        // fetch user from database
-
-        $stmt = $pdo -> prepare("SELECT * FROM users WHERE email: email");
-        $stmt -> execute(['email' => $email]);
-        $user = $stmt -> fetch(PDO::FETCH_ASSOC);
-
-        // verify password
-
-        
-    }
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form action="login_process.php" method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <div class="forgot-password">
+            <a href="forgot_password.php">Forgot Password?</a>
+        </div>
+    </div>
+</body>
+</html>
