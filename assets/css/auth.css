@@ -1,0 +1,551 @@
+/* ==========================================================================
+   auth.css — Fluent & Minimal Auth Styles (Login + Forgot Password)
+   DriveEase Support Desk
+   --------------------------------------------------------------------------
+   Design Philosophy:
+   - No glassmorphism — clean, flat surfaces with intentional depth
+   - Fluent motion: smooth transitions, subtle micro-interactions
+   - CSS custom properties for effortless dark/light mode switching
+   - Mobile-first responsive layout
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. GOOGLE FONT IMPORT
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* --------------------------------------------------------------------------
+   2. CSS CUSTOM PROPERTIES (Design Tokens)
+      Light mode is the default. The [data-theme="dark"] selector on <html>
+      overrides these values for dark mode — toggled via JS.
+   -------------------------------------------------------------------------- */
+:root {
+    /* Brand accent — used for CTAs, focus rings, links */
+    --color-accent:         #2563eb;
+    --color-accent-hover:   #1d4ed8;
+    --color-accent-subtle:  #dbeafe;
+
+    /* Backgrounds */
+    --color-bg:             #f5f6fa;
+    --color-surface:        #ffffff;
+
+    /* Borders */
+    --color-border:         #e2e8f0;
+    --color-border-focus:   #2563eb;
+
+    /* Input fill */
+    --color-input-bg:       #f1f5f9;
+    --color-input-bg-focus: #ffffff;
+
+    /* Text */
+    --color-text-primary:   #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-muted:     #94a3b8;
+    --color-text-link:      #2563eb;
+
+    /* Error / Success */
+    --color-error:          #ef4444;
+    --color-error-bg:       #fef2f2;
+    --color-success:        #22c55e;
+    --color-success-bg:     #f0fdf4;
+
+    /* Shadow — minimal, intentional */
+    --shadow-card:          0 2px 12px 0 rgba(15, 23, 42, 0.08);
+    --shadow-card-hover:    0 6px 24px 0 rgba(15, 23, 42, 0.12);
+
+    /* Motion */
+    --transition-fast:  0.15s ease;
+    --transition-base:  0.25s ease;
+    --transition-slow:  0.4s ease;
+
+    /* Radii */
+    --radius-sm:  6px;
+    --radius-md:  12px;
+    --radius-lg:  18px;
+}
+
+/* Dark Mode Token Overrides
+   Applied by adding data-theme="dark" to <html> via JS toggle */
+[data-theme="dark"] {
+    --color-accent:         #3b82f6;
+    --color-accent-hover:   #60a5fa;
+    --color-accent-subtle:  #1e3a5f;
+
+    --color-bg:             #0d1117;
+    --color-surface:        #161b22;
+
+    --color-border:         #30363d;
+    --color-border-focus:   #3b82f6;
+
+    --color-input-bg:       #21262d;
+    --color-input-bg-focus: #2d333b;
+
+    --color-text-primary:   #e6edf3;
+    --color-text-secondary: #8b949e;
+    --color-text-muted:     #484f58;
+    --color-text-link:      #58a6ff;
+
+    --color-error:          #f87171;
+    --color-error-bg:       #1f0a0a;
+    --color-success:        #4ade80;
+    --color-success-bg:     #0a1f0a;
+
+    --shadow-card:          0 2px 12px 0 rgba(0, 0, 0, 0.4);
+    --shadow-card-hover:    0 6px 24px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* --------------------------------------------------------------------------
+   3. BASE RESET
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Smooth token transition when toggling theme */
+html {
+    transition: background-color var(--transition-slow), color var(--transition-slow);
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    transition: background-color var(--transition-slow), color var(--transition-slow);
+}
+
+/* --------------------------------------------------------------------------
+   4. DARK MODE TOGGLE — Fixed top-right pill button
+   -------------------------------------------------------------------------- */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+    transition: background var(--transition-base),
+                border-color var(--transition-base),
+                box-shadow var(--transition-base),
+                transform var(--transition-fast);
+    font-family: inherit;
+}
+
+.theme-toggle:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
+}
+
+.theme-toggle .toggle-icon {
+    font-size: 15px;
+    line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   5. AUTH CARD — Main container
+   -------------------------------------------------------------------------- */
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 44px 40px;
+    box-shadow: var(--shadow-card);
+    transition: background var(--transition-slow),
+                border-color var(--transition-slow),
+                box-shadow var(--transition-base);
+}
+
+/* --------------------------------------------------------------------------
+   6. BRAND / HEADER
+   -------------------------------------------------------------------------- */
+.auth-brand {
+    margin-bottom: 32px;
+}
+
+/* Product label above the page title */
+.auth-brand__name {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 8px;
+    transition: color var(--transition-slow);
+}
+
+/* Main heading */
+.auth-brand__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    line-height: 1.25;
+    transition: color var(--transition-slow);
+}
+
+/* Helper text below heading */
+.auth-brand__subtitle {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-top: 6px;
+    transition: color var(--transition-slow);
+}
+
+/* --------------------------------------------------------------------------
+   7. FORM LAYOUT
+   -------------------------------------------------------------------------- */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Groups label + input + error message */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    transition: color var(--transition-slow);
+}
+
+/* Row inside a form-group to place label and a link side-by-side */
+.form-group__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-group__header label {
+    margin: 0;
+}
+
+/* Wrapper for positioning eye icon inside password input */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+   8. INPUT FIELDS
+   -------------------------------------------------------------------------- */
+.auth-input {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--color-input-bg);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    outline: none;
+    transition: border-color var(--transition-fast),
+                background var(--transition-fast),
+                box-shadow var(--transition-fast),
+                color var(--transition-slow);
+}
+
+.auth-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* Focus: accent border + subtle ring */
+.auth-input:focus {
+    border-color: var(--color-border-focus);
+    background: var(--color-input-bg-focus);
+    box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+/* Extra padding on right to make room for the eye-toggle button */
+.auth-input--password {
+    padding-right: 44px;
+}
+
+/* Eye icon button inside password input */
+.input-eye-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    padding: 0;
+    width: auto;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: 16px;
+    line-height: 1;
+    transition: color var(--transition-fast);
+}
+
+/* Override the global button lift for this icon-only button */
+.input-eye-btn:hover {
+    color: var(--color-text-secondary);
+    transform: none;
+    background: none;
+    box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   9. PRIMARY CTA BUTTON
+   -------------------------------------------------------------------------- */
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 20px;
+    margin-top: 6px;
+    background: var(--color-accent);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    outline: none;
+    transition: background var(--transition-fast),
+                transform var(--transition-fast),
+                box-shadow var(--transition-fast);
+}
+
+.btn-primary:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Inline loading spinner (shown via JS while request is pending) */
+.btn-primary .spinner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --------------------------------------------------------------------------
+   10. DIVIDER — visual separator between form sections
+   -------------------------------------------------------------------------- */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 4px 0;
+    transition: color var(--transition-slow);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+    transition: background var(--transition-slow);
+}
+
+/* --------------------------------------------------------------------------
+   11. FOOTER LINK AREA
+   -------------------------------------------------------------------------- */
+.auth-footer {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    transition: color var(--transition-slow);
+}
+
+.auth-footer a,
+.auth-link {
+    color: var(--color-text-link);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.auth-footer a:hover,
+.auth-link:hover {
+    opacity: 0.75;
+    text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   12. ALERT BANNERS — error and success feedback
+   -------------------------------------------------------------------------- */
+.auth-alert {
+    display: none; /* hidden by default; PHP/JS turns on the right modifier */
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    border-left: 3px solid;
+    line-height: 1.45;
+}
+
+.auth-alert--error {
+    display: block;
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    border-color: var(--color-error);
+}
+
+.auth-alert--success {
+    display: block;
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border-color: var(--color-success);
+}
+
+/* --------------------------------------------------------------------------
+   13. STEP INDICATOR — multi-step forgot password progress bar
+   -------------------------------------------------------------------------- */
+.step-indicator {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 28px;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex: 1;
+    position: relative;
+}
+
+/* Horizontal connector between steps */
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 13px;
+    left: calc(50% + 15px);
+    width: calc(100% - 30px);
+    height: 1px;
+    background: var(--color-border);
+    transition: background var(--transition-slow);
+}
+
+/* Completed step connector turns accent color */
+.step.completed:not(:last-child)::after {
+    background: var(--color-accent);
+}
+
+.step__dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    transition: all var(--transition-base);
+}
+
+.step.active .step__dot {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: #ffffff;
+}
+
+.step.completed .step__dot {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: #ffffff;
+}
+
+.step__label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-align: center;
+    transition: color var(--transition-base);
+}
+
+.step.active .step__label,
+.step.completed .step__label {
+    color: var(--color-accent);
+}
+
+/* --------------------------------------------------------------------------
+   14. SECURITY QUESTION DISPLAY BOX
+      Used in the forgot password flow to show the user's question.
+   -------------------------------------------------------------------------- */
+.security-question-box {
+    background: var(--color-input-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    transition: background var(--transition-slow), border-color var(--transition-slow);
+}
+
+/* --------------------------------------------------------------------------
+   15. RESPONSIVE — Mobile adjustments
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+    body {
+        padding: 16px;
+        align-items: flex-start;
+        padding-top: 56px;
+    }
+
+    .auth-card {
+        padding: 32px 22px;
+    }
+
+    .auth-brand__title {
+        font-size: 19px;
+    }
+}
