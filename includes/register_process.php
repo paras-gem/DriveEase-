@@ -38,3 +38,4 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Placeholder redirect until implementation is complete
 header('Location: ../signup.php');
 exit;
+?>  
