@@ -103,3 +103,5 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--txt
     body { padding: 18px; }
     .auth-card { padding: 32px 22px; }
 }
+
+.google-button-shell { width: 100%; min-height: 40px; display: flex; justify-content: center; }

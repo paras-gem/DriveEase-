@@ -1,6 +1,6 @@
 <?php
 /**
- * login.php — Sign-in page.
+ * login.php - Sign-in page.
  */
 $loginError = isset($_GET['error']) && $_GET['error'] === '1';
 $googleError = isset($_GET['error']) && $_GET['error'] === '2';
@@ -10,12 +10,15 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In — DriveEase Support</title>
+    <title>Sign In - DriveEase Support</title>
     <link rel="stylesheet" href="assets/css/auth.css">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');</script>
 </head>
 <body>
-    <button class="theme-toggle" id="themeToggle" type="button"><span id="toggleIcon">🌙</span></button>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+        <span class="toggle-icon" id="toggleIcon">🌙</span>
+        <span id="toggleLabel">Dark</span>
+    </button>
 
     <div class="auth-card">
         <div class="auth-brand">
@@ -36,29 +39,75 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
 
         <div class="auth-social">
             <div class="auth-divider">Or continue with</div>
-            <button class="btn-google" id="googleSignInButton" type="button">
-                <svg class="btn-google__icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="#EA4335" d="M24 9.5c3.3 0 6.25 1.14 8.58 3.36l6.4-6.4C35.11 2.86 29.97.75 24 .75 14.77.75 6.81 6.04 2.94 13.75l7.88 6.12C12.67 13.78 17.94 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.53c0-1.59-.14-3.11-.41-4.59H24v8.69h12.62c-.54 2.92-2.19 5.4-4.66 7.06l7.22 5.6C43.39 37.4 46.5 31.67 46.5 24.53z"/><path fill="#FBBC05" d="M10.82 27.89a14.47 14.47 0 0 1 0-7.78l-7.88-6.12A23.25 23.25 0 0 0 .5 24c0 3.62.87 7.05 2.44 10.01l7.88-6.12z"/><path fill="#34A853" d="M24 47.25c5.97 0 10.98-1.96 14.64-5.35l-7.22-5.6c-2.01 1.35-4.58 2.14-7.42 2.14-6.06 0-11.33-4.09-13.18-9.59l-7.88 6.12C6.81 42.46 14.77 47.25 24 47.25z"/></svg>
-                <span class="btn-google__label">Sign in with Google</span>
-            </button>
+            <div id="googleButton" class="google-button-shell"></div>
+            <div class="auth-alert auth-alert--error" id="googleLoadError" role="alert" style="display:none;">Google sign-in could not load. Please try email and password.</div>
         </div>
     </div>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
+    (function () {
+        const clientId = '556945368804-9i8u0n9sihkff4kriqb72cgji03vc8ro.apps.googleusercontent.com';
+        const html = document.documentElement;
+        const icons = { dark: ['☀️', 'Light'], light: ['🌙', 'Dark'] };
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            document.getElementById('toggleIcon').textContent = icons[theme][0];
+            document.getElementById('toggleLabel').textContent = icons[theme][1];
+        }
+
+        applyTheme(html.getAttribute('data-theme') || 'light');
+
+        document.getElementById('themeToggle').addEventListener('click', function () {
+            const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', next);
+            applyTheme(next);
+        });
+
         function handleGoogleCredentialResponse(response) {
             const form = document.createElement('form');
-            form.method = 'POST'; form.action = 'includes/login_process.php';
+            form.method = 'POST';
+            form.action = 'includes/login_process.php';
+
             const input = document.createElement('input');
-            input.type = 'hidden'; input.name = 'google_credential'; input.value = response.credential;
-            form.appendChild(input); document.body.appendChild(form); form.submit();
+            input.type = 'hidden';
+            input.name = 'google_credential';
+            input.value = response.credential;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
         }
-        window.onload = () => {
+
+        function showGoogleLoadError() {
+            document.getElementById('googleLoadError').style.display = 'block';
+        }
+
+        window.addEventListener('load', function () {
+            if (!window.google || !google.accounts || !google.accounts.id) {
+                showGoogleLoadError();
+                return;
+            }
+
             google.accounts.id.initialize({
-                client_id: 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com',
+                client_id: clientId,
                 callback: handleGoogleCredentialResponse
             });
-            document.getElementById('googleSignInButton').onclick = () => google.accounts.id.prompt();
-        };
+
+            const googleButton = document.getElementById('googleButton');
+            google.accounts.id.renderButton(
+                googleButton,
+                {
+                    theme: html.getAttribute('data-theme') === 'dark' ? 'filled_black' : 'outline',
+                    size: 'large',
+                    width: Math.min(340, googleButton.offsetWidth),
+                    text: 'signin_with',
+                    shape: 'rectangular'
+                }
+            );
+        });
+    })();
     </script>
 </body>
 </html>
