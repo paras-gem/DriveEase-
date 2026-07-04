@@ -2,45 +2,68 @@
 /**
  * includes/login_process.php — DriveEase Support Desk
  * -------------------------------------------------------------------
- * Handles standard login AND Google OAuth callback logic.
+ * Handles standard login and Google sign-in callback logic.
  */
 
 require_once('../config/db.php');
-require_once('../vendor/autoload.php'); // Ensure Google API Client is loaded
 
 session_start();
 
-// --- 1. GOOGLE OAUTH HANDLING ---
-if (isset($_GET['code'])) {
-    $client = new Google_Client();
-    $client->setClientId('YOUR_GOOGLE_CLIENT_ID');
-    $client->setClientSecret('YOUR_GOOGLE_CLIENT_SECRET');
-    $client->setRedirectUri('http://localhost/your_project/includes/login_process.php');
+function decodeGoogleJwtPayload(string $credential): ?array {
+    $parts = explode('.', $credential);
+    if (count($parts) < 2) {
+        return null;
+    }
 
-    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-    $client->setAccessToken($token['access_token']);
+    $payload = str_replace(['-', '_'], ['+', '/'], $parts[1]);
+    $padding = strlen($payload) % 4;
+    if ($padding) {
+        $payload .= str_repeat('=', 4 - $padding);
+    }
 
-    $google_oauth = new Google_Service_Oauth2($client);
-    $user_info = $google_oauth->userinfo->get();
+    $decoded = base64_decode($payload, true);
+    if ($decoded === false) {
+        return null;
+    }
 
-    $email = $user_info->email;
-    $name = $user_info->name;
+    $data = json_decode($decoded, true);
+    return is_array($data) ? $data : null;
+}
 
-    // Check if user exists, otherwise create (JIT Provisioning)
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+function createOrLoginUser(PDO $pdo, string $email, string $name): void {
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
     $stmt->execute(['email' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
         $stmt = $pdo->prepare("INSERT INTO users (username, email, provider) VALUES (:name, :email, 'google')");
         $stmt->execute(['name' => $name, 'email' => $email]);
-        $_SESSION['user_id'] = $pdo->lastInsertId();
+        $_SESSION['user_id'] = (int) $pdo->lastInsertId();
     } else {
-        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_id'] = (int) $user['id'];
     }
 
     $_SESSION['username'] = $name;
-    header('Location: ../dashboard.php');
+}
+
+// --- 1. GOOGLE SIGN-IN HANDLING ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['google_credential'])) {
+    $credential = trim($_POST['google_credential']);
+    $payload = decodeGoogleJwtPayload($credential);
+
+    if (!$payload || empty($payload['email'])) {
+        header('Location: ../login.php?error=2');
+        exit;
+    }
+
+    try {
+        session_regenerate_id(true);
+        createOrLoginUser($pdo, $payload['email'], $payload['name'] ?? $payload['given_name'] ?? explode('@', $payload['email'])[0]);
+        header('Location: ../dashboard.php');
+    } catch (Exception $e) {
+        error_log('Google login error: ' . $e->getMessage());
+        header('Location: ../login.php?error=2');
+    }
     exit;
 }
 

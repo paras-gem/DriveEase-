@@ -3,6 +3,7 @@
  * login.php — Sign-in page.
  */
 $loginError = isset($_GET['error']) && $_GET['error'] === '1';
+$googleError = isset($_GET['error']) && $_GET['error'] === '2';
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -16,7 +17,7 @@ $loginError = isset($_GET['error']) && $_GET['error'] === '1';
 </head>
 <body>
 
-    <button class="theme-toggle" id="themeToggle" type="button">
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
         <span class="toggle-icon" id="toggleIcon">🌙</span>
         <span id="toggleLabel">Dark</span>
     </button>
@@ -28,8 +29,10 @@ $loginError = isset($_GET['error']) && $_GET['error'] === '1';
             <p class="auth-brand__subtitle">Sign in to your account to continue.</p>
         </div>
 
-        <?php if ($loginError): ?>
-            <div class="auth-alert auth-alert--error">Invalid email or password.</div>
+        <?php if ($loginError || $googleError): ?>
+            <div class="auth-alert auth-alert--error">
+                <?= $googleError ? 'Google sign-in failed. Please try again.' : 'Invalid email or password.' ?>
+            </div>
         <?php endif; ?>
 
         <form class="auth-form" action="includes/login_process.php" method="POST" id="loginForm">
@@ -55,13 +58,17 @@ $loginError = isset($_GET['error']) && $_GET['error'] === '1';
             </button>
         </form>
 
-        <div style="margin: 20px 0;">
+        <div class="auth-social">
             <div class="auth-divider">Or continue with</div>
-            <br>
-            <a href="includes/login_process.php?google=1" class="btn-primary" style="background: #ffffff; color: #333; border: 1px solid var(--border);">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" style="margin-right: 10px;">
-                Sign in with Google
-            </a>
+            <button class="btn-google" id="googleSignInButton" type="button" aria-label="Sign in with Google">
+                <svg class="btn-google__icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#4285F4" d="M21.6 12.23c0-.79-.07-1.54-.2-2.27H12v4.3h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.9-1.75 2.98-4.32 2.98-7.55Z"/>
+                    <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.43l-3.24-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.07v2.58A10 10 0 0 0 12 22Z"/>
+                    <path fill="#FBBC05" d="M6.41 13.91A5.99 5.99 0 0 1 6.41 10.1V7.52H3.07a10 10 0 0 0 0 12.78l3.34-2.59Z"/>
+                    <path fill="#EA4335" d="M12 6.04c1.47 0 2.79.5 3.83 1.49l2.87-2.87A9.96 9.96 0 0 0 12 2a10 10 0 0 0-8.93 5.52l3.34 2.59C7.2 7.8 9.4 6.04 12 6.04Z"/>
+                </svg>
+                <span>Continue with Google</span>
+            </button>
         </div>
 
         <div class="auth-footer">
@@ -69,11 +76,70 @@ $loginError = isset($_GET['error']) && $_GET['error'] === '1';
         </div>
     </div>
 
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
-        // (Your existing JS here...)
-        document.getElementById('eyeBtn').addEventListener('click', function() {
+        const html = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const toggleLabel = document.getElementById('toggleLabel');
+        const eyeBtn = document.getElementById('eyeBtn');
+        const googleBtn = document.getElementById('googleSignInButton');
+
+        const themeIcons = {
+            light: { icon: '🌙', label: 'Dark' },
+            dark: { icon: '☀️', label: 'Light' }
+        };
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            toggleIcon.textContent = themeIcons[theme].icon;
+            toggleLabel.textContent = themeIcons[theme].label;
+        }
+
+        applyTheme(html.getAttribute('data-theme') || localStorage.getItem('theme') || 'light');
+
+        toggleBtn.addEventListener('click', function () {
+            const nextTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+        });
+
+        eyeBtn.addEventListener('click', function () {
             const pw = document.getElementById('password');
             pw.type = pw.type === 'password' ? 'text' : 'password';
+        });
+
+        function handleGoogleCredentialResponse(response) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'includes/login_process.php';
+
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = 'google_credential';
+            tokenInput.value = response.credential;
+
+            form.appendChild(tokenInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        window.addEventListener('load', function () {
+            if (window.google && google.accounts && google.accounts.id) {
+                google.accounts.id.initialize({
+                    client_id: '556945368804-9i8u0n9sihkff4kriqb72cgji03vc8ro.apps.googleusercontent.com',
+                    callback: handleGoogleCredentialResponse,
+                    auto_select: false,
+                    ux_mode: 'popup'
+                });
+
+                googleBtn.addEventListener('click', function () {
+                    google.accounts.id.prompt();
+                });
+            } else {
+                googleBtn.disabled = true;
+                googleBtn.innerHTML = '<span>Google SDK unavailable</span>';
+            }
         });
     </script>
 </body>
