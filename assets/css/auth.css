@@ -1,377 +1,75 @@
 /* auth.css — DriveEase Support Desk | Fluent Minimal Auth UI */
 
-/* ── 1. FONT ─────────────────────────────────────────────────── */
+/* ── 1. FONT & DESIGN TOKENS ─────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* ── 2. DESIGN TOKENS ────────────────────────────────────────── */
 :root {
     --accent:       #2563eb;
-    --accent-h:     #1d4ed8;        /* hover */
-    --accent-ring:  #dbeafe;        /* focus ring */
-
+    --accent-h:     #1d4ed8;
+    --accent-ring:  #dbeafe;
     --bg:           #f5f6fa;
     --surface:      #ffffff;
     --border:       #e2e8f0;
-
     --input-bg:     #f1f5f9;
-    --input-bg-f:   #ffffff;        /* focused */
-
+    --input-bg-f:   #ffffff;
     --txt-1:        #0f172a;
     --txt-2:        #475569;
-    --txt-m:        #94a3b8;        /* muted */
+    --txt-m:        #94a3b8;
     --txt-link:     #2563eb;
-
     --error:        #ef4444;
     --error-bg:     #fef2f2;
-    --ok:           #22c55e;
-    --ok-bg:        #f0fdf4;
-
     --shadow:       0 2px 12px rgba(15,23,42,.08);
     --shadow-h:     0 6px 24px rgba(15,23,42,.12);
-
-    --t-fast:       0.15s ease;
     --t-base:       0.25s ease;
-    --t-slow:       0.4s  ease;
-
-    --r-sm: 6px;
-    --r-lg: 18px;
+    --r-sm:         6px;
+    --r-lg:         18px;
 }
 
-/* Dark mode overrides — toggled by adding data-theme="dark" to <html> */
 [data-theme="dark"] {
-    --accent:      #3b82f6;
-    --accent-h:    #60a5fa;
-    --accent-ring: #1e3a5f;
-
-    --bg:          #0d1117;
-    --surface:     #161b22;
-    --border:      #30363d;
-
-    --input-bg:    #21262d;
-    --input-bg-f:  #2d333b;
-
-    --txt-1:   #e6edf3;
-    --txt-2:   #8b949e;
-    --txt-m:   #484f58;
-    --txt-link:#58a6ff;
-
-    --error:    #f87171;
-    --error-bg: #1f0a0a;
-    --ok:       #4ade80;
-    --ok-bg:    #0a1f0a;
-
-    --shadow:   0 2px 12px rgba(0,0,0,.4);
-    --shadow-h: 0 6px 24px rgba(0,0,0,.6);
+    --bg:           #0d1117;
+    --surface:      #161b22;
+    --border:       #30363d;
+    --input-bg:     #21262d;
+    --input-bg-f:   #2d333b;
+    --txt-1:        #e6edf3;
+    --txt-2:        #8b949e;
+    --txt-m:        #484f58;
 }
 
-/* ── 3. RESET ────────────────────────────────────────────────── */
+/* ── 2. BASE RESET ───────────────────────────────────────────── */
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--txt-1); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
 
-html { transition: background var(--t-slow), color var(--t-slow); }
+/* ── 3. COMPONENTS ───────────────────────────────────────────── */
+.auth-card { width: 100%; max-width: 420px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 44px 40px; box-shadow: var(--shadow); }
 
-body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    font-size: 15px;
-    background: var(--bg);
-    color: var(--txt-1);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    transition: background var(--t-slow), color var(--t-slow);
-}
+.theme-toggle { position: absolute; top: 18px; right: 18px; width: 40px; height: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; cursor: pointer; box-shadow: var(--shadow); }
 
-/* ── 4. THEME TOGGLE (subtle, compact) ─────────────────────── */
-.theme-toggle {
-    position: absolute;
-    top: 18px; right: 18px;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    color: var(--txt-2);
-    cursor: pointer;
-    box-shadow: var(--shadow);
-    transition: background var(--t-base), box-shadow var(--t-base), transform var(--t-fast), color var(--t-base);
-}
-.theme-toggle:hover { transform: translateY(-1px); box-shadow: var(--shadow-h); }
-.theme-toggle .toggle-icon { font-size: 16px; line-height: 1; }
+.auth-input { width: 100%; padding: 11px 14px; background: var(--input-bg); border: 1.5px solid var(--border); border-radius: var(--r-sm); }
+.auth-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-ring); }
 
-/* ── 5. AUTH CARD ────────────────────────────────────────────── */
-.auth-card {
-    width: 100%;
-    max-width: 420px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r-lg);
-    padding: 44px 40px;
-    box-shadow: var(--shadow);
-    transition: background var(--t-slow), border-color var(--t-slow);
-}
+.btn-primary { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); font-weight: 600; cursor: pointer; }
 
-/* ── 6. HEADER / BRAND ───────────────────────────────────────── */
-.auth-brand { margin-bottom: 28px; }
+/* ── 4. FLUENT GOOGLE BUTTON ─────────────────────────────────── */
+.auth-social { margin: 20px 0; }
+.auth-divider { display: flex; align-items: center; gap: 10px; color: var(--txt-m); font-size: 11px; text-transform: uppercase; margin-bottom: 12px; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-.auth-brand__name {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 8px;
-}
-.auth-brand__title {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--txt-1);
-    line-height: 1.25;
-}
-.auth-brand__subtitle {
-    font-size: 13px;
-    color: var(--txt-2);
-    margin-top: 6px;
-}
-
-/* ── 7. FORM ─────────────────────────────────────────────────── */
-.auth-form { display: flex; flex-direction: column; gap: 16px; }
-
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-
-.form-group label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .05em;
-    text-transform: uppercase;
-    color: var(--txt-m);
-}
-
-/* Side-by-side label + inline link (e.g., "Forgot password?") */
-.form-group__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.form-group__header label { margin: 0; }
-
-/* Wrapper lets icons sit inside inputs */
-.input-wrapper { position: relative; display: flex; align-items: center; }
-
-/* ── 8. INPUTS ───────────────────────────────────────────────── */
-.auth-input {
-    width: 100%;
-    padding: 11px 14px;
-    background: var(--input-bg);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    font: 14px/1.5 'Inter', sans-serif;
-    color: var(--txt-1);
-    outline: none;
-    transition: border-color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
-}
-.auth-input::placeholder { color: var(--txt-m); }
-.auth-input:focus {
-    border-color: var(--accent);
-    background: var(--input-bg-f);
-    box-shadow: 0 0 0 3px var(--accent-ring);
-}
-.auth-input--password { padding-right: 44px; }
-
-/* <select> inherits .auth-input; override appearance for cross-browser arrow */
-select.auth-input {
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 38px;
-    cursor: pointer;
-}
-
-/* Eye icon button inside password field */
-.input-eye-btn {
-    position: absolute; right: 12px;
-    background: none; border: none;
-    font-size: 16px; cursor: pointer;
-    color: var(--txt-m);
-    width: auto; padding: 0;
-    transition: color var(--t-fast);
-}
-.input-eye-btn:hover { color: var(--txt-2); transform: none; box-shadow: none; background: none; }
-
-/* ── 9. PRIMARY BUTTON ───────────────────────────────────────── */
-.btn-primary {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 20px;
-    margin-top: 4px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: var(--r-sm);
-    font: 600 14px/1 'Inter', sans-serif;
-    letter-spacing: .02em;
-    cursor: pointer;
-    transition: background var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
-}
-.btn-primary:hover { background: var(--accent-h); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(37,99,235,.3); }
-.btn-primary:active { transform: none; box-shadow: none; }
-
-/* Inline spinner — shown via JS while request is pending */
-.btn-primary .spinner {
-    display: none;
-    width: 15px; height: 15px;
-    border: 2px solid rgba(255,255,255,.35);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── 10. SOCIAL / GOOGLE BUTTON ────────────────────────────── */
-.auth-social {
-    margin: 20px 0 0;
-}
 .btn-google {
     width: 100%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
     padding: 11px 16px;
-    margin-top: 12px;
-    background: #fff;
-    color: #3c4043;
-    border: 1px solid #dadce0;
-    border-radius: 4px;
-    font: 500 14px/1 'Inter', sans-serif;
-    cursor: pointer;
-    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.16);
-    transition: box-shadow var(--t-fast), transform var(--t-fast), border-color var(--t-fast);
-}
-.btn-google:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(60, 64, 67, 0.2);
-    border-color: #c7cbd1;
-}
-.btn-google:focus-visible {
-    outline: 2px solid var(--accent-ring);
-    outline-offset: 2px;
-}
-.btn-google:active { transform: none; box-shadow: 0 1px 2px rgba(60, 64, 67, 0.16); }
-.btn-google:disabled {
-    opacity: .65;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-.btn-google__icon {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-}
-.btn-google__label {
-    line-height: 1;
-    font-weight: 500;
-}
-
-.auth-footer {
-    margin-top: 22px;
-    text-align: center;
-    font-size: 13px;
-    color: var(--txt-2);
-}
-.auth-link, .auth-footer a {
-    color: var(--txt-link);
-    text-decoration: none;
-    font-weight: 500;
-    transition: opacity var(--t-fast);
-}
-.auth-link:hover, .auth-footer a:hover { opacity: .75; text-decoration: underline; }
-
-/* ── 11. ALERT BANNERS ───────────────────────────────────────── */
-.auth-alert {
-    display: none;
-    padding: 10px 14px;
-    border-radius: var(--r-sm);
-    font-size: 13px;
-    font-weight: 500;
-    border-left: 3px solid;
-    line-height: 1.45;
-}
-.auth-alert--error   { display: block; background: var(--error-bg);  color: var(--error);  border-color: var(--error);  }
-.auth-alert--success { display: block; background: var(--ok-bg);     color: var(--ok);     border-color: var(--ok);     }
-
-/* ── 12. DIVIDER ─────────────────────────────────────────────── */
-.auth-divider {
-    display: flex; align-items: center; gap: 10px;
-    color: var(--txt-m);
-    font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
-}
-.auth-divider::before, .auth-divider::after {
-    content: ''; flex: 1; height: 1px; background: var(--border);
-}
-
-/* ── 13. STEP INDICATOR (forgot password) ────────────────────── */
-.step-indicator {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 24px;
-}
-.step { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; position: relative; }
-
-/* Connecting line between steps */
-.step:not(:last-child)::after {
-    content: '';
-    position: absolute; top: 12px;
-    left: calc(50% + 14px);
-    width: calc(100% - 28px);
-    height: 1px;
-    background: var(--border);
-    transition: background var(--t-slow);
-}
-.step.completed:not(:last-child)::after { background: var(--accent); }
-
-.step__dot {
-    width: 25px; height: 25px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
     background: var(--surface);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 600;
-    color: var(--txt-m);
-    transition: all var(--t-base);
-}
-.step.active .step__dot, .step.completed .step__dot {
-    border-color: var(--accent);
-    background: var(--accent);
-    color: #fff;
-}
-.step__label { font-size: 10px; font-weight: 500; color: var(--txt-m); text-align: center; }
-.step.active .step__label, .step.completed .step__label { color: var(--accent); }
-
-/* ── 14. SECURITY QUESTION BOX ───────────────────────────────── */
-.security-question-box {
-    background: var(--input-bg);
     border: 1px solid var(--border);
     border-radius: var(--r-sm);
-    padding: 12px 14px;
-    font-size: 14px; font-weight: 500;
-    color: var(--txt-1);
+    font: 600 14px 'Inter', sans-serif;
+    color: var(--txt-2);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all var(--t-base);
 }
-
-/* ── 15. RESPONSIVE ──────────────────────────────────────────── */
-@media (max-width: 480px) {
-    body { padding: 16px; align-items: flex-start; padding-top: 56px; }
-    .auth-card { padding: 30px 20px; }
-    .auth-brand__title { font-size: 19px; }
-}
+.btn-google:hover { background: var(--input-bg); border-color: var(--txt-m); transform: translateY(-1px); box-shadow: var(--shadow-h); }
+.btn-google__icon { width: 18px; height: 18px; }
