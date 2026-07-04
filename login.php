@@ -17,9 +17,9 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
 </head>
 <body>
 
+    <!-- Subtle theme switch so the auth screen keeps its clean layout. -->
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
         <span class="toggle-icon" id="toggleIcon">🌙</span>
-        <span id="toggleLabel">Dark</span>
     </button>
 
     <div class="auth-card">
@@ -60,6 +60,7 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
 
         <div class="auth-social">
             <div class="auth-divider">Or continue with</div>
+            <!-- Rounded Google button that matches the login card styling. -->
             <button class="btn-google" id="googleSignInButton" type="button" aria-label="Sign in with Google">
                 <svg class="btn-google__icon" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill="#4285F4" d="M21.6 12.23c0-.79-.07-1.54-.2-2.27H12v4.3h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.9-1.75 2.98-4.32 2.98-7.55Z"/>
@@ -81,20 +82,19 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
         const html = document.documentElement;
         const toggleBtn = document.getElementById('themeToggle');
         const toggleIcon = document.getElementById('toggleIcon');
-        const toggleLabel = document.getElementById('toggleLabel');
         const eyeBtn = document.getElementById('eyeBtn');
         const googleBtn = document.getElementById('googleSignInButton');
 
+        // Keep the auth experience readable in both themes without changing the card layout.
         const themeIcons = {
-            light: { icon: '🌙', label: 'Dark' },
-            dark: { icon: '☀️', label: 'Light' }
+            light: '🌙',
+            dark: '☀️'
         };
 
         function applyTheme(theme) {
             html.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
-            toggleIcon.textContent = themeIcons[theme].icon;
-            toggleLabel.textContent = themeIcons[theme].label;
+            toggleIcon.textContent = themeIcons[theme];
         }
 
         applyTheme(html.getAttribute('data-theme') || localStorage.getItem('theme') || 'light');
@@ -109,6 +109,7 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
             pw.type = pw.type === 'password' ? 'text' : 'password';
         });
 
+        // Google sign-in uses the popup flow so the user stays on the same page.
         function handleGoogleCredentialResponse(response) {
             const form = document.createElement('form');
             form.method = 'POST';
