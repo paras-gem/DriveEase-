@@ -62,11 +62,11 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
             <div class="auth-divider">Or continue with</div>
             <!-- Google-branded icon for the sign-in button. -->
             <button class="btn-google" id="googleSignInButton" type="button" aria-label="Sign in with Google">
-                <svg class="btn-google__icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="#4285F4" d="M21.6 12.23c0-.79-.07-1.54-.2-2.27H12v4.3h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.9-1.75 2.98-4.32 2.98-7.55Z"/>
-                    <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.43l-3.24-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.07v2.58A10 10 0 0 0 12 22Z"/>
-                    <path fill="#FBBC05" d="M6.41 13.91A5.99 5.99 0 0 1 6.41 10.1V7.52H3.07a10 10 0 0 0 0 12.78l3.34-2.59Z"/>
-                    <path fill="#EA4335" d="M12 6.04c1.47 0 2.79.5 3.83 1.49l2.87-2.87A9.96 9.96 0 0 0 12 2a10 10 0 0 0-8.93 5.52l3.34 2.59C7.2 7.8 9.4 6.04 12 6.04Z"/>
+                <svg class="btn-google__icon" viewBox="0 0 48 48" aria-hidden="true">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.5 24.5c0-1.54-.15-3.02-.43-4.45H24v8.43h12.43c-.54 2.9-2.18 5.36-4.65 7.02l7.2 5.6C43.9 37.01 46.5 31.2 46.5 24.5z"/>
+                    <path fill="#FBBC05" d="M10.54 28.41A14.5 14.5 0 0 1 10.54 19.6l-7.98-6.19A24.0 24.0 0 0 0 0 24.5c0 3.87.93 7.54 2.56 10.78l7.98-6.19z"/>
+                    <path fill="#34A853" d="M24 46.5c6.47 0 11.9-2.14 15.87-5.81l-7.2-5.6c-2.01 1.35-4.58 2.15-8.67 2.15-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 46.5 24 46.5z"/>
                 </svg>
                 <span>Continue with Google</span>
             </button>
