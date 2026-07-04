@@ -42,6 +42,10 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
             <div id="googleButton" class="google-button-shell"></div>
             <div class="auth-alert auth-alert--error" id="googleLoadError" role="alert" style="display:none;">Google sign-in could not load. Please try email and password.</div>
         </div>
+
+        <div class="auth-footer">
+            New here? <a href="signup.php">Create an account</a>
+        </div>
     </div>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
