@@ -1,4 +1,5 @@
 <?php
+$resetError = isset($_GET['error']) ? (int) $_GET['error'] : 0;
 /**
  * forgot_password.php — Step 1 of the password-reset flow.
  *
@@ -23,15 +24,12 @@
 </head>
 <body>
 
-    <!-- Theme toggle -->
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
         <span class="toggle-icon" id="toggleIcon">🌙</span>
         <span id="toggleLabel">Dark</span>
     </button>
 
     <div class="auth-card" role="main">
-
-        <!-- 3-step progress indicator -->
         <div class="step-indicator" aria-label="Password reset progress">
             <div class="step completed" id="step1">
                 <div class="step__dot">✓</div>
@@ -53,7 +51,12 @@
             <p class="auth-brand__subtitle" id="subtitle">Enter your email to find your account.</p>
         </div>
 
-        <!-- Step 1: Email lookup (AJAX) -->
+        <?php if ($resetError === 1): ?>
+            <div class="auth-alert auth-alert--error" role="alert">We could not verify that reset request. Please try again.</div>
+        <?php elseif ($resetError === 2): ?>
+            <div class="auth-alert auth-alert--error" role="alert">That security answer did not match. Please try again.</div>
+        <?php endif; ?>
+
         <form class="auth-form" id="emailForm" novalidate>
             <div class="auth-alert auth-alert--error" id="emailError" role="alert" style="display:none;"></div>
             <div class="form-group">
@@ -67,7 +70,6 @@
             </button>
         </form>
 
-        <!-- Step 2: Security question answer (revealed on email success) -->
         <div id="questionArea" style="display:none;" aria-live="polite">
             <p class="auth-brand__subtitle" style="margin-bottom:14px;">Answer your security question below.</p>
             <div class="security-question-box" id="questionText"></div>
@@ -78,7 +80,7 @@
                 <div class="form-group">
                     <label for="answer">Your answer</label>
                     <input class="auth-input" type="text" id="answer" name="answer"
-                           placeholder="Type your answer…" autocomplete="off" required>
+                           placeholder="Type your answer..." autocomplete="off" required>
                 </div>
                 <button class="btn-primary" type="submit" id="answerBtn">
                     <span class="spinner" id="answerSpinner"></span>
@@ -88,12 +90,10 @@
         </div>
 
         <div class="auth-footer">Remembered it? <a href="login.php">Sign in</a></div>
-
     </div>
 
     <script>
     (function () {
-        /* Theme toggle */
         const html  = document.documentElement;
         const icons = { dark: ['☀️','Light'], light: ['🌙','Dark'] };
 
@@ -111,7 +111,6 @@
             applyTheme(next);
         });
 
-        /* Email form — AJAX to get_question.php */
         const emailForm  = document.getElementById('emailForm');
         const emailError = document.getElementById('emailError');
         const emailBtn   = document.getElementById('emailBtn');
@@ -120,7 +119,7 @@
         function setEmailLoading(on) {
             emailBtn.disabled = on;
             emailSpinner.style.display = on ? 'block' : 'none';
-            document.getElementById('emailBtnText').textContent = on ? 'Searching…' : 'Find My Account';
+            document.getElementById('emailBtnText').textContent = on ? 'Searching...' : 'Find My Account';
         }
 
         emailForm.addEventListener('submit', function (e) {
@@ -139,7 +138,7 @@
                     if (d.found) {
                         document.getElementById('questionText').textContent = d.question;
                         document.getElementById('hiddenUserId').value = d.user_id;
-                        emailForm.style.display    = 'none';
+                        emailForm.style.display = 'none';
                         document.getElementById('questionArea').style.display = 'block';
                         document.getElementById('subtitle').textContent = 'Your security question is shown below.';
                     } else {
@@ -154,11 +153,10 @@
                 });
         });
 
-        /* Answer form — loading state only */
         document.getElementById('answerForm').addEventListener('submit', function () {
             document.getElementById('answerBtn').disabled = true;
             document.getElementById('answerSpinner').style.display = 'block';
-            document.getElementById('answerBtnText').textContent = 'Verifying…';
+            document.getElementById('answerBtnText').textContent = 'Verifying...';
         });
     })();
     </script>

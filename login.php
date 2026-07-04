@@ -30,13 +30,14 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
         <form class="auth-form" action="includes/login_process.php" method="POST">
             <div class="form-group"><label>Email</label><input class="auth-input" type="email" name="email" required></div>
             <div class="form-group"><label>Password</label><input class="auth-input" type="password" name="password" required></div>
+            <div class="forgot-password"><a href="forgot_password.php">Forgot password?</a></div>
             <button class="btn-primary" type="submit">Sign In</button>
         </form>
 
         <div class="auth-social">
             <div class="auth-divider">Or continue with</div>
             <button class="btn-google" id="googleSignInButton" type="button">
-                <svg class="btn-google__icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.54-.15-3.02-.43-4.45H24v8.43h12.43c-.54 2.9-2.18 5.36-4.65 7.02l7.2 5.6C43.9 37.01 46.5 31.2 46.5 24.5z"/><path fill="#FBBC05" d="M10.54 28.41A14.5 14.5 0 0 1 10.54 19.6l-7.98-6.19A24.0 24.0 0 0 0 0 24.5c0 3.87.93 7.54 2.56 10.78l7.98-6.19z"/><path fill="#34A853" d="M24 46.5c6.47 0 11.9-2.14 15.87-5.81l-7.2-5.6c-2.01 1.35-4.58 2.15-8.67 2.15-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 46.5 24 46.5z"/></svg>
+                <svg class="btn-google__icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="#EA4335" d="M24 9.5c3.3 0 6.25 1.14 8.58 3.36l6.4-6.4C35.11 2.86 29.97.75 24 .75 14.77.75 6.81 6.04 2.94 13.75l7.88 6.12C12.67 13.78 17.94 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.53c0-1.59-.14-3.11-.41-4.59H24v8.69h12.62c-.54 2.92-2.19 5.4-4.66 7.06l7.22 5.6C43.39 37.4 46.5 31.67 46.5 24.53z"/><path fill="#FBBC05" d="M10.82 27.89a14.47 14.47 0 0 1 0-7.78l-7.88-6.12A23.25 23.25 0 0 0 .5 24c0 3.62.87 7.05 2.44 10.01l7.88-6.12z"/><path fill="#34A853" d="M24 47.25c5.97 0 10.98-1.96 14.64-5.35l-7.22-5.6c-2.01 1.35-4.58 2.14-7.42 2.14-6.06 0-11.33-4.09-13.18-9.59l-7.88 6.12C6.81 42.46 14.77 47.25 24 47.25z"/></svg>
                 <span class="btn-google__label">Sign in with Google</span>
             </button>
         </div>
