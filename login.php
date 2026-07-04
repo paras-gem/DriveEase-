@@ -60,7 +60,7 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
 
         <div class="auth-social">
             <div class="auth-divider">Or continue with</div>
-            <!-- Rounded Google button that matches the login card styling. -->
+            <!-- Google-branded icon for the sign-in button. -->
             <button class="btn-google" id="googleSignInButton" type="button" aria-label="Sign in with Google">
                 <svg class="btn-google__icon" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill="#4285F4" d="M21.6 12.23c0-.79-.07-1.54-.2-2.27H12v4.3h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.9-1.75 2.98-4.32 2.98-7.55Z"/>
