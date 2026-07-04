@@ -62,13 +62,13 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
             <div class="auth-divider">Or continue with</div>
             <!-- Google-branded icon for the sign-in button. -->
             <button class="btn-google" id="googleSignInButton" type="button" aria-label="Sign in with Google">
-                <svg class="btn-google__icon" viewBox="0 0 48 48" aria-hidden="true">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                    <path fill="#4285F4" d="M46.5 24.5c0-1.54-.15-3.02-.43-4.45H24v8.43h12.43c-.54 2.9-2.18 5.36-4.65 7.02l7.2 5.6C43.9 37.01 46.5 31.2 46.5 24.5z"/>
-                    <path fill="#FBBC05" d="M10.54 28.41A14.5 14.5 0 0 1 10.54 19.6l-7.98-6.19A24.0 24.0 0 0 0 0 24.5c0 3.87.93 7.54 2.56 10.78l7.98-6.19z"/>
-                    <path fill="#34A853" d="M24 46.5c6.47 0 11.9-2.14 15.87-5.81l-7.2-5.6c-2.01 1.35-4.58 2.15-8.67 2.15-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 46.5 24 46.5z"/>
+                <svg class="btn-google__icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#4285F4" d="M21.6 12.23c0-.66-.06-1.29-.17-1.9H12v3.6h5.39a4.61 4.61 0 0 1-2 3.03v2.5h3.24c1.89-1.74 2.97-4.3 2.97-7.23Z"/>
+                    <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.61-2.43l-3.24-2.5c-.9.61-2.06.97-3.37.97-2.59 0-4.79-1.74-5.58-4.09H3.07v2.57A10 10 0 0 0 12 22Z"/>
+                    <path fill="#FBBC05" d="M6.42 13.95A6.01 6.01 0 0 1 6.42 10.05V7.48H3.07a10 10 0 0 0 0 12.94l3.35-2.57Z"/>
+                    <path fill="#EA4335" d="M12 6.04c1.46 0 2.78.5 3.82 1.49l2.86-2.86A9.96 9.96 0 0 0 12 2 9.98 9.98 0 0 0 3.07 7.48l3.35 2.57C7.21 7.78 9.41 6.04 12 6.04Z"/>
                 </svg>
-                <span>Continue with Google</span>
+                <span class="btn-google__label">Continue with Google</span>
             </button>
         </div>
 
@@ -139,7 +139,11 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
                 });
             } else {
                 googleBtn.disabled = true;
-                googleBtn.innerHTML = '<span>Google SDK unavailable</span>';
+                googleBtn.setAttribute('aria-disabled', 'true');
+                const label = googleBtn.querySelector('.btn-google__label');
+                if (label) {
+                    label.textContent = 'Google unavailable';
+                }
             }
         });
     </script>
