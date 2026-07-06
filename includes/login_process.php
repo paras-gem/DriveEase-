@@ -1,6 +1,11 @@
 <?php
+ob_start(); // Prevent headers already sent by buffering output
+
 require_once('../config/db.php');
-session_start();
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 const GOOGLE_CLIENT_ID = '556945368804-9i8u0n9sihkff4kriqb72cgji03vc8ro.apps.googleusercontent.com';
 
@@ -44,56 +49,63 @@ function verifyGoogleCredential(string $credential): ?array
     return $payload;
 }
 
-// --- GOOGLE SIGN-IN FLOW ---
-if (isset($_POST['google_credential'])) {
-    $payload = verifyGoogleCredential((string) $_POST['google_credential']);
+try {
+    // --- GOOGLE SIGN-IN FLOW ---
+    if (isset($_POST['google_credential'])) {
+        $payload = verifyGoogleCredential((string) $_POST['google_credential']);
 
-    if ($payload) {
-        $email = $payload['email'];
-        $name = $payload['name'] ?? $email;
+        if ($payload) {
+            $email = $payload['email'];
+            $name = $payload['name'] ?? $email;
+
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
+            $stmt->execute(['email' => $email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, provider) VALUES (:name, :email, 'google')");
+                $stmt->execute(['name' => $name, 'email' => $email]);
+                $_SESSION['user_id'] = $pdo->lastInsertId();
+                $_SESSION['username'] = $name;
+            } else {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'] ?: $name;
+            }
+
+            session_regenerate_id(true);
+            header('Location: ../dashboard.php');
+            exit;
+        }
+
+        header('Location: ../login.php?error=2');
+        exit;
+    }
+
+    // --- STANDARD LOGIN FLOW ---
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = trim($_POST['email'] ?? '');
+        $password = trim($_POST['password'] ?? '');
 
         $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) {
-            $stmt = $pdo->prepare("INSERT INTO users (username, email, provider) VALUES (:name, :email, 'google')");
-            $stmt->execute(['name' => $name, 'email' => $email]);
-            $_SESSION['user_id'] = $pdo->lastInsertId();
-            $_SESSION['username'] = $name;
-        } else {
+        if ($user && password_verify($password, $user['password'])) {
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'] ?: $name;
+            $_SESSION['username'] = $user['username'];
+            header('Location: ../dashboard.php');
+            exit;
         }
 
-        session_regenerate_id(true);
-        header('Location: ../dashboard.php');
+        header('Location: ../login.php?error=1');
         exit;
     }
-
-    header('Location: ../login.php?error=2');
-    exit;
-}
-
-// --- STANDARD LOGIN FLOW ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
-    $password = trim($_POST['password'] ?? '');
-
-    $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
-    $stmt->execute(['email' => $email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($user && password_verify($password, $user['password'])) {
-        session_regenerate_id(true);
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        header('Location: ../dashboard.php');
-        exit;
-    }
-
-    header('Location: ../login.php?error=1');
-    exit;
+} catch (PDOException $e) {
+    // Catch database errors and output them instead of a blank 500 error screen
+    die("<div style='color:red; font-family:sans-serif; padding: 20px;'><h3>Database Error in login_process.php</h3><p>" . htmlspecialchars($e->getMessage()) . "</p></div>");
+} catch (Exception $e) {
+    die("<div style='color:red; font-family:sans-serif; padding: 20px;'><h3>Error in login_process.php</h3><p>" . htmlspecialchars($e->getMessage()) . "</p></div>");
 }
 
 header('Location: ../login.php');
