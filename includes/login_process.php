@@ -1,14 +1,38 @@
 <?php
-ob_start(); // Prevent headers already sent by buffering output
+/**
+ * includes/login_process.php — DriveEase Support Desk
+ * -------------------------------------------------------------------
+ * Handles POST requests from login.php via AJAX.
+ * Returns a JSON response indicating success or failure.
+ * -------------------------------------------------------------------
+ */
+// 1. Buffer output to prevent accidental output from breaking JSON response
+ob_start();
 
+// 2. Set the response header to JSON
+header('Content-Type: application/json');
+
+// 3. Include the database configuration (PDO connection)
 require_once('../config/db.php');
 
+// 4. Start the session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Ensure the request is an HTTP POST request
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    ob_end_clean();
+    echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
+    exit;
+}
+
+// Google Client ID for OAuth
 const GOOGLE_CLIENT_ID = '556945368804-9i8u0n9sihkff4kriqb72cgji03vc8ro.apps.googleusercontent.com';
 
+/**
+ * Verify Google Credential using Google's tokeninfo endpoint.
+ */
 function verifyGoogleCredential(string $credential): ?array
 {
     $url = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($credential);
@@ -50,7 +74,9 @@ function verifyGoogleCredential(string $credential): ?array
 }
 
 try {
-    // --- GOOGLE SIGN-IN FLOW ---
+    // --------------------------------------------------------
+    // A. GOOGLE SIGN-IN FLOW
+    // --------------------------------------------------------
     if (isset($_POST['google_credential'])) {
         $payload = verifyGoogleCredential((string) $_POST['google_credential']);
 
@@ -62,6 +88,7 @@ try {
             $stmt->execute(['email' => $email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            // If user doesn't exist, create them
             if (!$user) {
                 $stmt = $pdo->prepare("INSERT INTO users (username, email, provider) VALUES (:name, :email, 'google')");
                 $stmt->execute(['name' => $name, 'email' => $email]);
@@ -73,40 +100,56 @@ try {
             }
 
             session_regenerate_id(true);
-            header('Location: ../dashboard.php');
+            ob_end_clean();
+            // In Google flow we can either redirect directly (if traditional form) or return JSON
+            // We'll return JSON because we will intercept it with AJAX.
+            echo json_encode(['success' => true, 'message' => 'Google Login successful!']);
             exit;
         }
 
-        header('Location: ../login.php?error=2');
+        ob_end_clean();
+        echo json_encode(['success' => false, 'message' => 'Google sign-in verification failed.']);
         exit;
     }
 
-    // --- STANDARD LOGIN FLOW ---
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $email = trim($_POST['email'] ?? '');
-        $password = trim($_POST['password'] ?? '');
+    // --------------------------------------------------------
+    // B. STANDARD EMAIL/PASSWORD LOGIN FLOW
+    // --------------------------------------------------------
+    if (isset($_POST['email']) && isset($_POST['password'])) {
+        $email = trim($_POST['email']);
+        $password = trim($_POST['password']);
 
+        // Check if user exists
         $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Verify the password securely
         if ($user && password_verify($password, $user['password'])) {
             session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            header('Location: ../dashboard.php');
+            $_SESSION['username'] = $user['username'] ?? $user['fullname']; // use fullname if username is null
+            
+            ob_end_clean();
+            echo json_encode(['success' => true, 'message' => 'Login successful! Redirecting...']);
             exit;
         }
 
-        header('Location: ../login.php?error=1');
+        ob_end_clean();
+        echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
         exit;
     }
+    
+    // Fallback if POST array is empty
+    ob_end_clean();
+    echo json_encode(['success' => false, 'message' => 'Invalid request data.']);
+    
 } catch (PDOException $e) {
-    // Catch database errors and output them instead of a blank 500 error screen
-    die("<div style='color:red; font-family:sans-serif; padding: 20px;'><h3>Database Error in login_process.php</h3><p>" . htmlspecialchars($e->getMessage()) . "</p></div>");
+    error_log("Login DB Error: " . $e->getMessage());
+    ob_end_clean();
+    echo json_encode(['success' => false, 'message' => 'Database error occurred. Please try again.']);
 } catch (Exception $e) {
-    die("<div style='color:red; font-family:sans-serif; padding: 20px;'><h3>Error in login_process.php</h3><p>" . htmlspecialchars($e->getMessage()) . "</p></div>");
+    error_log("Login Gen Error: " . $e->getMessage());
+    ob_end_clean();
+    echo json_encode(['success' => false, 'message' => 'An unexpected error occurred.']);
 }
-
-header('Location: ../login.php');
-exit;

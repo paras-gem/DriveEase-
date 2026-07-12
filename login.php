@@ -1,9 +1,8 @@
 <?php
 /**
  * login.php - Sign-in page.
+ * Fully rewritten to use AJAX for seamless sign-in.
  */
-$loginError = isset($_GET['error']) && $_GET['error'] === '1';
-$googleError = isset($_GET['error']) && $_GET['error'] === '2';
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -11,32 +10,49 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In - DriveEase Support</title>
+    <!-- Use our custom auth stylesheet -->
     <link rel="stylesheet" href="assets/css/auth.css">
+    <!-- Apply theme quickly -->
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');</script>
 </head>
 <body>
+    
+    <!-- Theme Toggle -->
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
         <span class="toggle-icon" id="toggleIcon">🌙</span>
         <span id="toggleLabel">Dark</span>
     </button>
 
     <div class="auth-card">
+        
+        <!-- Header -->
         <div class="auth-brand">
             <h1 class="auth-brand__title">Welcome back</h1>
             <p class="auth-brand__subtitle">Sign in to your account to continue.</p>
         </div>
 
-        <?php if ($loginError || $googleError): ?>
-            <div class="auth-alert auth-alert--error"><?= $googleError ? 'Google sign-in failed.' : 'Invalid credentials.' ?></div>
-        <?php endif; ?>
+        <!-- Alert Container for AJAX Responses -->
+        <div id="ajaxAlert" class="auth-alert" style="display: none;" role="alert"></div>
 
-        <form class="auth-form" action="includes/login_process.php" method="POST">
-            <div class="form-group"><label>Email</label><input class="auth-input" type="email" name="email" required></div>
-            <div class="form-group"><label>Password</label><input class="auth-input" type="password" name="password" required></div>
+        <!-- Traditional Login Form (AJAX attached below) -->
+        <form class="auth-form" id="loginForm" novalidate>
+            <div class="form-group">
+                <label>Email</label>
+                <input class="auth-input" type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input class="auth-input" type="password" name="password" required>
+            </div>
             <div class="forgot-password"><a href="forgot_password.php">Forgot password?</a></div>
-            <button class="btn-primary" type="submit">Sign In</button>
+            
+            <button class="btn-primary" type="submit" id="submitBtn">
+                <span class="spinner" id="spinner"></span>
+                <span id="btnText">Sign In</span>
+            </button>
         </form>
 
+        <!-- Social Login -->
         <div class="auth-social">
             <div class="auth-divider">Or continue with</div>
             <div id="googleButton" class="google-button-shell"></div>
@@ -48,9 +64,16 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
         </div>
     </div>
 
+    <!-- Google Identity API script -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Application Logic -->
     <script>
-    (function () {
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        // ----------------------------------------------------
+        // 1. Theme Configuration
+        // ----------------------------------------------------
         const clientId = '556945368804-9i8u0n9sihkff4kriqb72cgji03vc8ro.apps.googleusercontent.com';
         const html = document.documentElement;
         const icons = { dark: ['☀️', 'Light'], light: ['🌙', 'Dark'] };
@@ -69,19 +92,30 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
             applyTheme(next);
         });
 
-        function handleGoogleCredentialResponse(response) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'includes/login_process.php';
+        // ----------------------------------------------------
+        // 2. Google OAuth Handling (AJAX)
+        // ----------------------------------------------------
+        window.handleGoogleCredentialResponse = function(response) {
+            
+            // Send the Google credential token via AJAX
+            const formData = new FormData();
+            formData.append('google_credential', response.credential);
 
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'google_credential';
-            input.value = response.credential;
-
-            form.appendChild(input);
-            document.body.appendChild(form);
-            form.submit();
+            fetch('includes/login_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = 'dashboard.php';
+                } else {
+                    document.getElementById('ajaxAlert').style.display = 'block';
+                    document.getElementById('ajaxAlert').className = 'auth-alert auth-alert--error';
+                    document.getElementById('ajaxAlert').textContent = data.message;
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
 
         function showGoogleLoadError() {
@@ -111,7 +145,63 @@ $googleError = isset($_GET['error']) && $_GET['error'] === '2';
                 }
             );
         });
-    })();
+
+        // ----------------------------------------------------
+        // 3. Standard Login Form Submission (AJAX)
+        // ----------------------------------------------------
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner   = document.getElementById('spinner');
+        const btnText   = document.getElementById('btnText');
+        const alertBox  = document.getElementById('ajaxAlert');
+
+        loginForm.addEventListener('submit', function (e) {
+            e.preventDefault(); // Stop standard redirect
+
+            // Reset UI states
+            alertBox.style.display = 'none';
+            alertBox.className = 'auth-alert';
+            submitBtn.disabled = true;
+            spinner.style.display = 'block';
+            btnText.textContent = 'Authenticating…';
+
+            // Gather inputs
+            const formData = new FormData(loginForm);
+
+            // Execute POST request to backend
+            fetch('includes/login_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alertBox.style.display = 'block';
+                alertBox.textContent = data.message;
+
+                if (data.success) {
+                    alertBox.classList.add('auth-alert--success');
+                    // On success, quickly redirect to the dashboard
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.php';
+                    }, 800);
+                } else {
+                    // Show error, re-enable button
+                    alertBox.classList.add('auth-alert--error');
+                    submitBtn.disabled = false;
+                    spinner.style.display = 'none';
+                    btnText.textContent = 'Sign In';
+                }
+            })
+            .catch(error => {
+                alertBox.style.display = 'block';
+                alertBox.className = 'auth-alert auth-alert--error';
+                alertBox.textContent = 'A network error occurred.';
+                submitBtn.disabled = false;
+                spinner.style.display = 'none';
+                btnText.textContent = 'Sign In';
+            });
+        });
+    });
     </script>
 </body>
 </html>

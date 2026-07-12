@@ -2,39 +2,84 @@
 /**
  * includes/register_process.php — DriveEase Support Desk
  * -------------------------------------------------------------------
- * Handles POST from signup.php.
- *
- * TODO — implement the following steps:
- *   1. Validate inputs (required fields, email format, password length)
- *   2. Check passwords match — redirect to ../signup.php?error=2 if not
- *   3. Check email uniqueness — redirect to ../signup.php?error=1 if taken
- *   4. Hash password  : password_hash($password, PASSWORD_BCRYPT)
- *   5. Hash security answer similarly
- *   6. INSERT new user record into `users` table
- *   7. On success    → redirect to ../signup.php?success=1
- *      On DB error   → log error, redirect to ../signup.php?error=3
+ * Handles POST requests from signup.php via AJAX.
+ * Returns a JSON response indicating success or failure.
  * -------------------------------------------------------------------
  */
 
-require_once('../config/db.php');
-session_start();
+// 1. Set the response header to JSON so the frontend knows how to parse it
+header('Content-Type: application/json');
 
-// Only accept POST
+// 2. Include the database configuration (PDO connection)
+require_once('../config/db.php');
+
+// 3. Start the session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 4. Ensure the request is an HTTP POST request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../signup.php');
+    echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
     exit;
 }
 
-// --- TODO: collect inputs ---
-// $fullname         = trim($_POST['fullname']         ?? '');
-// $email            = trim($_POST['email']            ?? '');
-// $password         = trim($_POST['password']         ?? '');
-// $confirm_password = trim($_POST['confirm_password'] ?? '');
-// $security_question = trim($_POST['security_question'] ?? '');
-// $security_answer   = trim($_POST['security_answer']   ?? '');
+// 5. Collect and sanitize input data
+$fullname          = trim($_POST['fullname'] ?? '');
+$email             = trim($_POST['email'] ?? '');
+$password          = trim($_POST['password'] ?? '');
+$confirm_password  = trim($_POST['confirm_password'] ?? '');
+$security_question = trim($_POST['security_question'] ?? '');
+$security_answer   = trim($_POST['security_answer'] ?? '');
 
-// --- TODO: validate, hash, and insert ---
+// 6. Validate inputs (check for empty fields)
+if (empty($fullname) || empty($email) || empty($password) || empty($security_question) || empty($security_answer)) {
+    echo json_encode(['success' => false, 'message' => 'Please fill in all required fields.']);
+    exit;
+}
 
-// Placeholder redirect until implementation is complete
-header('Location: ../signup.php');
-exit;
+// 7. Check if the password and confirm password match
+if ($password !== $confirm_password) {
+    echo json_encode(['success' => false, 'message' => 'Passwords do not match.']);
+    exit;
+}
+
+try {
+    // 8. Check email uniqueness (prevent duplicate registrations)
+    $stmt = $pdo->prepare('SELECT id FROM users WHERE email = :email');
+    $stmt->execute(['email' => $email]);
+    if ($stmt->fetch()) {
+        // If an ID is returned, the email is already in the database
+        echo json_encode(['success' => false, 'message' => 'That email is already registered.']);
+        exit;
+    }
+
+    // 9. Hash the password and security answer securely using BCRYPT
+    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+    $hashed_answer   = password_hash($security_answer, PASSWORD_BCRYPT);
+
+    // 10. Prepare the INSERT statement for the new user record
+    $insertStmt = $pdo->prepare('
+        INSERT INTO users (fullname, username, email, password, security_question, security_answer) 
+        VALUES (:fullname, :username, :email, :password, :security_question, :security_answer)
+    ');
+    
+    // 11. Execute the query with the sanitized and hashed data
+    // We use $fullname as the username fallback if username is not explicitly requested.
+    $insertStmt->execute([
+        'fullname'          => $fullname,
+        'username'          => $fullname, 
+        'email'             => $email,
+        'password'          => $hashed_password,
+        'security_question' => $security_question,
+        'security_answer'   => $hashed_answer
+    ]);
+
+    // 12. Send a success response back to the AJAX handler
+    echo json_encode(['success' => true, 'message' => 'Account created successfully!']);
+    
+} catch (PDOException $e) {
+    // 13. Catch any database errors and log them (do not show raw DB errors to the user)
+    error_log("Registration Error: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Database error occurred. Please try again later.']);
+}

@@ -12,7 +12,7 @@ $pass = 'GDrive2026';
 
 // DSN: Data source name: it tells that where the host is located 
 
-$dsn = "mysql:host=$host;dbname=$db;charset";
+$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 
 // connection logic 
 
