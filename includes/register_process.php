@@ -59,16 +59,16 @@ try {
     $hashed_answer   = password_hash($security_answer, PASSWORD_BCRYPT);
 
     // 10. Prepare the INSERT statement for the new user record
+    //     We use fullname for both fullname and username columns.
     $insertStmt = $pdo->prepare('
-        INSERT INTO users (fullname, username, email, password, security_question, security_answer) 
+        INSERT INTO users (fullname, username, email, password, security_question, security_answer)
         VALUES (:fullname, :username, :email, :password, :security_question, :security_answer)
     ');
-    
+
     // 11. Execute the query with the sanitized and hashed data
-    // We use $fullname as the username fallback if username is not explicitly requested.
     $insertStmt->execute([
         'fullname'          => $fullname,
-        'username'          => $fullname, 
+        'username'          => $fullname,
         'email'             => $email,
         'password'          => $hashed_password,
         'security_question' => $security_question,

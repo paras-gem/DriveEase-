@@ -88,10 +88,13 @@ try {
             $stmt->execute(['email' => $email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // If user doesn't exist, create them
+            // If user doesn't exist, create them using Google profile data
             if (!$user) {
-                $stmt = $pdo->prepare("INSERT INTO users (username, email, provider) VALUES (:name, :email, 'google')");
-                $stmt->execute(['name' => $name, 'email' => $email]);
+                $stmt = $pdo->prepare(
+                    "INSERT INTO users (fullname, username, email, provider)
+                     VALUES (:name, :name2, :email, 'google')"
+                );
+                $stmt->execute(['name' => $name, 'name2' => $name, 'email' => $email]);
                 $_SESSION['user_id'] = $pdo->lastInsertId();
                 $_SESSION['username'] = $name;
             } else {
