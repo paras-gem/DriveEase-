@@ -79,7 +79,7 @@ try {
     echo json_encode(['success' => true, 'message' => 'Account created successfully!']);
     
 } catch (PDOException $e) {
-    // 13. Catch any database errors and log them (do not show raw DB errors to the user)
+    // 13. Catch any database errors and log them
     error_log("Registration Error: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Database error occurred. Please try again later.']);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }

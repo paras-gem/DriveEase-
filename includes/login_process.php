@@ -147,9 +147,9 @@ try {
 } catch (PDOException $e) {
     error_log("Login DB Error: " . $e->getMessage());
     ob_end_clean();
-    echo json_encode(['success' => false, 'message' => 'Database error occurred. Please try again.']);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 } catch (Exception $e) {
     error_log("Login Gen Error: " . $e->getMessage());
     ob_end_clean();
-    echo json_encode(['success' => false, 'message' => 'An unexpected error occurred.']);
+    echo json_encode(['success' => false, 'message' => 'An unexpected error: ' . $e->getMessage()]);
 }

@@ -20,10 +20,10 @@ try {
     $pdo = new PDO($dsn, $user, $pass );
 
     // set error mode 
-    $pdo ->setAttribute( PDO::ERRMODE_EXCEPTION, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Set default fetch mode to associative array
-    $pdo -> setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
     // echo connected to the database successfully
 } catch(PDOException $e){
