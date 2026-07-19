@@ -14,7 +14,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="nav-item">
+            <a href="fleet.php" class="nav-item">
                 <i class="fa-solid fa-car"></i> Fleet
             </a>
         </li>
