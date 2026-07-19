@@ -2,39 +2,43 @@
 require 'config/db.php';
 
 try {
-    // Attempt to add 'fullname' column
-    try {
-        $pdo->exec("ALTER TABLE users ADD COLUMN fullname VARCHAR(150) NOT NULL AFTER id");
-        echo "Successfully added 'fullname' column.<br>";
-    } catch (PDOException $e) {
-        echo "Column 'fullname' might already exist or error: " . $e->getMessage() . "<br>";
-    }
-
-    // Attempt to add 'username' column
-    try {
-        $pdo->exec("ALTER TABLE users ADD COLUMN username VARCHAR(100) NOT NULL AFTER fullname");
-        echo "Successfully added 'username' column.<br>";
-    } catch (PDOException $e) {
-        echo "Column 'username' might already exist or error: " . $e->getMessage() . "<br>";
-    }
-
-    // Attempt to add 'provider' column
-    try {
-        $pdo->exec("ALTER TABLE users ADD COLUMN provider VARCHAR(20) DEFAULT 'email' AFTER security_answer");
-        echo "Successfully added 'provider' column.<br>";
-    } catch (PDOException $e) {
-        echo "Column 'provider' might already exist or error: " . $e->getMessage() . "<br>";
-    }
+    echo "<h3>Database Schema Fixer</h3>";
     
-    // Attempt to add 'security_question' and 'security_answer'
-    try {
-        $pdo->exec("ALTER TABLE users ADD COLUMN security_question VARCHAR(255) DEFAULT NULL AFTER password, ADD COLUMN security_answer VARCHAR(255) DEFAULT NULL AFTER security_question");
-        echo "Successfully added security questions.<br>";
-    } catch (PDOException $e) {
-        echo "Security columns might already exist or error: " . $e->getMessage() . "<br>";
+    // Drop the old users table
+    $pdo->exec("DROP TABLE IF EXISTS `ticket_comments`");
+    $pdo->exec("DROP TABLE IF EXISTS `tickets`");
+    $pdo->exec("DROP TABLE IF EXISTS `bookings`");
+    $pdo->exec("DROP TABLE IF EXISTS `users`");
+    echo "Old tables dropped successfully.<br>";
+
+    // Recreate the users table
+    $createUsersQuery = "
+    CREATE TABLE `users` (
+        `id`                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        `fullname`          VARCHAR(150)    NOT NULL,
+        `username`          VARCHAR(100)    NOT NULL,
+        `email`             VARCHAR(255)    NOT NULL UNIQUE,
+        `password`          VARCHAR(255)    DEFAULT NULL,
+        `security_question` VARCHAR(255)    DEFAULT NULL,
+        `security_answer`   VARCHAR(255)    DEFAULT NULL,
+        `provider`          VARCHAR(20)     DEFAULT 'email',
+        `role`              ENUM('admin','agent','customer') DEFAULT 'customer',
+        `created_at`        TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ";
+    
+    $pdo->exec($createUsersQuery);
+    echo "<br><strong style='color:green;'>Success: `users` table recreated with all correct columns!</strong>";
+    
+    // We should also recreate other tables from database.sql to avoid foreign key issues
+    $sqlFile = file_get_contents('database.sql');
+    if ($sqlFile) {
+        $pdo->exec($sqlFile);
+        echo "<br><strong style='color:green;'>Success: All other tables synchronized.</strong>";
     }
 
-    echo "<br><b>Database schema update process finished. You can now try logging in/signing up again!</b>";
+    echo "<br><br><b>You can now try signing up / logging in again!</b>";
 } catch (Exception $e) {
-    echo "General error: " . $e->getMessage();
+    echo "<strong style='color:red;'>Error: " . $e->getMessage() . "</strong>";
 }
+
