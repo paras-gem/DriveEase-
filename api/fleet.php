@@ -16,13 +16,12 @@ try {
     } elseif ($method === 'POST') {
         // Insert new vehicle
         $data = json_decode(file_get_contents('php://input'), true);
-        if(isset($data['make'], $data['model'], $data['year'], $data['plate'])) {
-            $stmt = $pdo->prepare("INSERT INTO fleet (make, model, year, plate, status) VALUES (?, ?, ?, ?, ?)");
+        if(isset($data['vehicle_name'], $data['plate'], $data['rent_cost'])) {
+            $stmt = $pdo->prepare("INSERT INTO fleet (vehicle_name, plate, rent_cost, status) VALUES (?, ?, ?, ?)");
             $stmt->execute([
-                $data['make'], 
-                $data['model'], 
-                $data['year'], 
+                $data['vehicle_name'], 
                 $data['plate'], 
+                $data['rent_cost'], 
                 $data['status'] ?? 'available'
             ]);
             echo json_encode(['success' => true, 'message' => 'Vehicle added successfully.', 'id' => $pdo->lastInsertId()]);

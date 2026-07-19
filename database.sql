@@ -22,10 +22,9 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- ============================================================
 CREATE TABLE IF NOT EXISTS `fleet` (
     `id`           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `make`         VARCHAR(100)    NOT NULL,
-    `model`        VARCHAR(100)    NOT NULL,
-    `year`         YEAR            NOT NULL,
+    `vehicle_name` VARCHAR(150)    NOT NULL,
     `plate`        VARCHAR(30)     NOT NULL UNIQUE,
+    `rent_cost`    DECIMAL(10,2)   DEFAULT 0.00,
     `status`       ENUM('available','in_use','maintenance') DEFAULT 'available',
     `created_at`   TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -23,22 +23,18 @@ include 'includes/sidebar.php';
     <div class="content-grid">
         <div class="card" style="grid-column: span 2;">
             <h3 class="card-title">Add New Vehicle</h3>
-            <form id="addVehicleForm" style="display: grid; gap: 10px; grid-template-columns: 1fr 1fr 1fr 1fr auto; align-items: end;">
+            <form id="addVehicleForm" style="display: grid; gap: 10px; grid-template-columns: 2fr 1fr 1fr auto; align-items: end;">
                 <div>
-                    <label>Make</label>
-                    <input type="text" id="make" name="make" required style="width: 100%; padding: 8px;">
+                    <label style="display: block; margin-bottom: 5px;">Search & Add Vehicle</label>
+                    <input type="text" id="vehicle_name" name="vehicle_name" required style="width: 100%; padding: 8px;" placeholder="e.g. Toyota Camry 2023">
                 </div>
                 <div>
-                    <label>Model</label>
-                    <input type="text" id="model" name="model" required style="width: 100%; padding: 8px;">
-                </div>
-                <div>
-                    <label>Year</label>
-                    <input type="number" id="year" name="year" required style="width: 100%; padding: 8px;" min="1900" max="2100">
-                </div>
-                <div>
-                    <label>License Plate</label>
+                    <label style="display: block; margin-bottom: 5px;">License Plate</label>
                     <input type="text" id="plate" name="plate" required style="width: 100%; padding: 8px;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px;">Rent Cost ($/day)</label>
+                    <input type="number" id="rent_cost" name="rent_cost" required style="width: 100%; padding: 8px;" step="0.01" min="0" placeholder="50.00">
                 </div>
                 <button type="submit" class="btn" style="padding: 10px 20px; height: 35px; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color);">Add Vehicle</button>
             </form>
@@ -51,10 +47,9 @@ include 'includes/sidebar.php';
                 <thead>
                     <tr>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">ID</th>
-                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Make</th>
-                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Model</th>
-                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Year</th>
+                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Vehicle Name</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Plate</th>
+                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Rent Cost</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Status</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Action</th>
                     </tr>
@@ -90,10 +85,9 @@ function fetchFleet() {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${vehicle.id}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${vehicle.make}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${vehicle.model}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${vehicle.year}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${vehicle.vehicle_name}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${vehicle.plate}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">$${vehicle.rent_cost}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${vehicle.status}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
                         <button onclick="deleteVehicle(${vehicle.id})" class="btn" style="background: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">Delete</button>
@@ -111,10 +105,9 @@ function fetchFleet() {
 document.getElementById('addVehicleForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    const make = document.getElementById('make').value;
-    const model = document.getElementById('model').value;
-    const year = document.getElementById('year').value;
+    const vehicle_name = document.getElementById('vehicle_name').value;
     const plate = document.getElementById('plate').value;
+    const rent_cost = document.getElementById('rent_cost').value;
     const messageDiv = document.getElementById('formMessage');
     
     fetch('api/fleet.php', {
@@ -122,7 +115,7 @@ document.getElementById('addVehicleForm').addEventListener('submit', function(e)
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ make, model, year, plate, status: 'available' })
+        body: JSON.stringify({ vehicle_name, plate, rent_cost, status: 'available' })
     })
     .then(response => response.json())
     .then(data => {

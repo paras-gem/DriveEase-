@@ -9,7 +9,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="nav-item">
+            <a href="tickets.php" class="nav-item">
                 <i class="fa-solid fa-ticket"></i> Support Tickets
             </a>
         </li>
@@ -19,7 +19,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="nav-item">
+            <a href="customers.php" class="nav-item">
                 <i class="fa-solid fa-users"></i> Customers
             </a>
         </li>
