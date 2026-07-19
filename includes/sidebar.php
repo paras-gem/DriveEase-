@@ -23,6 +23,16 @@
                 <i class="fa-solid fa-users"></i> Customers
             </a>
         </li>
+        <li>
+            <a href="support.php" class="nav-item">
+                <i class="fa-solid fa-headset"></i> Support
+            </a>
+        </li>
+        <li>
+            <a href="about.php" class="nav-item">
+                <i class="fa-solid fa-circle-info"></i> About
+            </a>
+        </li>
         <li style="margin-top: auto;">
             <a href="includes/logout.php" class="nav-item" style="color: #ef4444;">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout

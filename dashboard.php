@@ -32,47 +32,27 @@ include 'includes/sidebar.php';
     <div class="stats-grid">
         <div class="stat-card">
             <span class="stat-label">Active Tickets</span>
-            <span class="stat-value">12</span>
+            <span class="stat-value" id="stat-tickets">...</span>
         </div>
         <div class="stat-card">
             <span class="stat-label">Pending Bookings</span>
-            <span class="stat-value">4</span>
+            <span class="stat-value" id="stat-bookings">...</span>
         </div>
         <div class="stat-card">
             <span class="stat-label">Available Fleet</span>
-            <span class="stat-value">18</span>
+            <span class="stat-value" id="stat-fleet">...</span>
         </div>
         <div class="stat-card">
             <span class="stat-label">Total Customers</span>
-            <span class="stat-value">1,240</span>
+            <span class="stat-value" id="stat-customers">...</span>
         </div>
     </div>
 
     <div class="content-grid">
         <div class="card">
             <h3 class="card-title">Recent Activity</h3>
-            <ul class="activity-list">
-                <li class="activity-item">
-                    <div class="activity-icon"><i class="fa-solid fa-ticket"></i></div>
-                    <div class="activity-details">
-                        <h4>Ticket #1042 Updated</h4>
-                        <p>John Doe replied to "Engine issue with Sedan".</p>
-                    </div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon"><i class="fa-solid fa-car"></i></div>
-                    <div class="activity-details">
-                        <h4>New Vehicle Added</h4>
-                        <p>Toyota Camry 2023 was added to the fleet.</p>
-                    </div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon"><i class="fa-solid fa-user-plus"></i></div>
-                    <div class="activity-details">
-                        <h4>New Customer Registered</h4>
-                        <p>Jane Smith created an account.</p>
-                    </div>
-                </li>
+            <ul class="activity-list" id="recent-activity-list">
+                <li class="activity-item" style="justify-content: center; color: var(--text-secondary);">Loading activity...</li>
             </ul>
             <a href="#" class="btn" style="margin-top: 16px; width: 100%; background: var(--bg-color); color: var(--text-primary);">View All Logs</a>
         </div>
@@ -86,5 +66,49 @@ include 'includes/sidebar.php';
         </div>
     </div>
 </main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    fetch('api/dashboard-stats.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update stats
+                document.getElementById('stat-tickets').textContent = data.stats.tickets;
+                document.getElementById('stat-bookings').textContent = data.stats.bookings;
+                document.getElementById('stat-fleet').textContent = data.stats.fleet;
+                document.getElementById('stat-customers').textContent = data.stats.customers;
+                
+                // Update activity
+                const activityList = document.getElementById('recent-activity-list');
+                activityList.innerHTML = ''; // clear loading
+                
+                if (data.activity.length === 0) {
+                    activityList.innerHTML = '<li class="activity-item" style="justify-content: center; color: var(--text-secondary);">No recent activity.</li>';
+                } else {
+                    data.activity.forEach(act => {
+                        const li = document.createElement('li');
+                        li.className = 'activity-item';
+                        li.innerHTML = `
+                            <div class="activity-icon"><i class="fa-solid ${act.icon}"></i></div>
+                            <div class="activity-details">
+                                <h4>${act.title}</h4>
+                                <p>${act.desc}</p>
+                            </div>
+                        `;
+                        activityList.appendChild(li);
+                    });
+                }
+            } else {
+                console.error("Failed to load stats:", data.error);
+                document.getElementById('recent-activity-list').innerHTML = '<li class="activity-item" style="justify-content: center; color: red;">Failed to load activity.</li>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('recent-activity-list').innerHTML = '<li class="activity-item" style="justify-content: center; color: red;">Error fetching data.</li>';
+        });
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>
