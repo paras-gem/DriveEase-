@@ -91,15 +91,16 @@ try {
             // If user doesn't exist, create them using Google profile data
             if (!$user) {
                 $stmt = $pdo->prepare(
-                    "INSERT INTO users (fullname, username, email, provider)
-                     VALUES (:name, :name2, :email, 'google')"
+                    "INSERT INTO users (name, email, google_id)
+                     VALUES (:name, :email, :google_id)"
                 );
-                $stmt->execute(['name' => $name, 'name2' => $name, 'email' => $email]);
+                // Payload 'sub' contains the Google unique ID
+                $stmt->execute(['name' => $name, 'email' => $email, 'google_id' => $payload['sub']]);
                 $_SESSION['user_id'] = $pdo->lastInsertId();
                 $_SESSION['username'] = $name;
             } else {
                 $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'] ?: $name;
+                $_SESSION['username'] = $user['name'] ?? $name;
             }
 
             session_regenerate_id(true);
@@ -131,7 +132,7 @@ try {
         if ($user && password_verify($password, $user['password'])) {
             session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'] ?? $user['fullname']; // use fullname if username is null
+            $_SESSION['username'] = $user['name'] ?? 'User'; // use name if available
             
             ob_end_clean();
             echo json_encode(['success' => true, 'message' => 'Login successful! Redirecting...']);
