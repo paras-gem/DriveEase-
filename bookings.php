@@ -118,7 +118,7 @@ function loadBookings() {
                 tr.innerHTML = `
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">#${booking.id}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: 500;">${booking.user_name || 'User ' + booking.user_id}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${booking.vehicle_name} (${booking.plate})</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${booking.vehicle_name}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${booking.start_date} to ${booking.end_date}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
                         <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; background: ${booking.status === 'pending' ? '#f59e0b' : (booking.status === 'confirmed' ? '#3b82f6' : (booking.status === 'completed' ? '#10b981' : '#ef4444'))}; color: white; text-transform: capitalize;">

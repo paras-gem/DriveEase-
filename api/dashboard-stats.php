@@ -4,13 +4,13 @@ header('Content-Type: application/json');
 
 try {
     // Get counts
-    $ticketsStmt = $pdo->query("SELECT COUNT(*) FROM tickets WHERE status != 'closed'");
+    $ticketsStmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status != 'closed'");
     $activeTickets = $ticketsStmt->fetchColumn();
 
     $bookingsStmt = $pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'pending'");
     $pendingBookings = $bookingsStmt->fetchColumn();
 
-    $fleetStmt = $pdo->query("SELECT COUNT(*) FROM fleet WHERE status = 'available'");
+    $fleetStmt = $pdo->query("SELECT COUNT(*) FROM vehicles WHERE status = 'available'");
     $availableFleet = $fleetStmt->fetchColumn();
 
     $customersStmt = $pdo->query("SELECT COUNT(*) FROM users");
@@ -20,12 +20,12 @@ try {
     // For now we will just return empty or simple DB logic
     $activity = [];
     
-    $recentVehicles = $pdo->query("SELECT id, vehicle_name, plate, created_at FROM fleet ORDER BY created_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+    $recentVehicles = $pdo->query("SELECT id, vehicle_name, created_at FROM vehicles ORDER BY created_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
     foreach($recentVehicles as $v) {
         $activity[] = [
             'icon' => 'fa-car',
             'title' => 'New Vehicle Added',
-            'desc' => "{$v['vehicle_name']} ({$v['plate']}) was added to the fleet.",
+            'desc' => "{$v['vehicle_name']} was added to the fleet.",
             'time' => $v['created_at']
         ];
     }

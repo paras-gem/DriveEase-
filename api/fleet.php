@@ -9,19 +9,17 @@ $method = $_SERVER['REQUEST_METHOD'];
 try {
     if ($method === 'GET') {
         // Fetch all fleet vehicles
-        $stmt = $pdo->query("SELECT * FROM fleet ORDER BY id DESC");
+        $stmt = $pdo->query("SELECT * FROM vehicles ORDER BY id DESC");
         $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($vehicles);
 
     } elseif ($method === 'POST') {
         // Insert new vehicle
         $data = json_decode(file_get_contents('php://input'), true);
-        if(isset($data['vehicle_name'], $data['plate'], $data['rent_cost'])) {
-            $stmt = $pdo->prepare("INSERT INTO fleet (vehicle_name, plate, rent_cost, status) VALUES (?, ?, ?, ?)");
+        if(isset($data['vehicle_name'])) {
+            $stmt = $pdo->prepare("INSERT INTO vehicles (vehicle_name, status) VALUES (?, ?)");
             $stmt->execute([
                 $data['vehicle_name'], 
-                $data['plate'], 
-                $data['rent_cost'], 
                 $data['status'] ?? 'available'
             ]);
             echo json_encode(['success' => true, 'message' => 'Vehicle added successfully.', 'id' => $pdo->lastInsertId()]);
@@ -34,7 +32,7 @@ try {
         // Delete a vehicle
         $data = json_decode(file_get_contents('php://input'), true);
         if(isset($data['id'])) {
-            $stmt = $pdo->prepare("DELETE FROM fleet WHERE id = ?");
+            $stmt = $pdo->prepare("DELETE FROM vehicles WHERE id = ?");
             $stmt->execute([$data['id']]);
             echo json_encode(['success' => true, 'message' => 'Vehicle deleted successfully.']);
         } else {

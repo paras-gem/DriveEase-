@@ -8,10 +8,10 @@ try {
     if ($method === 'GET') {
         // Fetch all bookings with user and vehicle details
         $stmt = $pdo->query("
-            SELECT b.*, u.name as user_name, f.vehicle_name, f.plate 
+            SELECT b.*, u.name as user_name, f.vehicle_name 
             FROM bookings b 
             LEFT JOIN users u ON b.user_id = u.id 
-            LEFT JOIN fleet f ON b.fleet_id = f.id
+            LEFT JOIN vehicles f ON b.fleet_id = f.id
             ORDER BY b.created_at DESC
         ");
         $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);

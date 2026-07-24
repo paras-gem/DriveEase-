@@ -7,7 +7,7 @@ try {
     if ($method === 'GET') {
         $stmt = $pdo->query("
             SELECT t.*, u.name as user_name 
-            FROM tickets t 
+            FROM support_tickets t 
             LEFT JOIN users u ON t.user_id = u.id 
             ORDER BY t.created_at DESC
         ");
@@ -16,7 +16,7 @@ try {
     } elseif ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         if (isset($data['user_id'], $data['subject'], $data['description'])) {
-            $stmt = $pdo->prepare("INSERT INTO tickets (user_id, subject, description, priority) VALUES (?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO support_tickets (user_id, subject, description, priority) VALUES (?, ?, ?, ?)");
             $stmt->execute([
                 $data['user_id'],
                 $data['subject'],
