@@ -59,9 +59,9 @@ include 'includes/sidebar.php';
         <div class="card">
             <h3 class="card-title">Quick Actions</h3>
             <div style="display: flex; flex-direction: column; gap: 12px;">
-                <a href="#" class="btn" style="background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); width: 100%;"><i class="fa-solid fa-plus"></i> New Ticket</a>
-                <a href="#" class="btn" style="background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); width: 100%;"><i class="fa-solid fa-car-side"></i> Add Vehicle</a>
-                <a href="#" class="btn" style="background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); width: 100%;"><i class="fa-solid fa-address-book"></i> New Booking</a>
+                <a href="tickets.php" class="btn" style="background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); width: 100%;"><i class="fa-solid fa-plus"></i> New Ticket</a>
+                <a href="fleet.php" class="btn" style="background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); width: 100%;"><i class="fa-solid fa-car-side"></i> Add Vehicle</a>
+                <a href="bookings.php" class="btn" style="background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); width: 100%;"><i class="fa-solid fa-address-book"></i> New Booking</a>
             </div>
         </div>
     </div>

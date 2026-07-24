@@ -19,6 +19,11 @@
             </a>
         </li>
         <li>
+            <a href="bookings.php" class="nav-item">
+                <i class="fa-solid fa-book-open"></i> Bookings
+            </a>
+        </li>
+        <li>
             <a href="customers.php" class="nav-item">
                 <i class="fa-solid fa-users"></i> Customers
             </a>
