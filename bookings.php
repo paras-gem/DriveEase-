@@ -88,7 +88,7 @@ function loadAvailableVehicles() {
             availableCars.forEach(vehicle => {
                 const opt = document.createElement('option');
                 opt.value = vehicle.id;
-                opt.textContent = `${vehicle.vehicle_name} (${vehicle.plate}) - $${vehicle.rent_cost}/day`;
+                opt.textContent = vehicle.vehicle_name;
                 select.appendChild(opt);
             });
         })
