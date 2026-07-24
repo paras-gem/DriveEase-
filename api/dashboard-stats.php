@@ -13,7 +13,7 @@ try {
     $fleetStmt = $pdo->query("SELECT COUNT(*) FROM vehicles WHERE status = 'available'");
     $availableFleet = $fleetStmt->fetchColumn();
 
-    $customersStmt = $pdo->query("SELECT COUNT(*) FROM users");
+    $customersStmt = $pdo->query("SELECT COUNT(*) FROM customers");
     $totalCustomers = $customersStmt->fetchColumn();
     
     // Get recent activity (last 5 tickets or bookings)
