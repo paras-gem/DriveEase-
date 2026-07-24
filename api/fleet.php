@@ -1,50 +1,39 @@
 <?php
-// API for fleet management
-require_once('../config/db.php');
-
+require_once __DIR__ . '/../config/db.php';
 header('Content-Type: application/json');
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
     if ($method === 'GET') {
-        // Fetch all fleet vehicles
-        $stmt = $pdo->query("SELECT * FROM vehicles ORDER BY id DESC");
-        $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($vehicles);
-
+        $stmt = $pdo->query('SELECT id, vehicle_name, plate, rent_cost, status, created_at FROM fleet ORDER BY created_at DESC');
+        echo json_encode($stmt->fetchAll());
     } elseif ($method === 'POST') {
-        // Insert new vehicle
-        $data = json_decode(file_get_contents('php://input'), true);
-        if(isset($data['vehicle_name'])) {
-            $stmt = $pdo->prepare("INSERT INTO vehicles (vehicle_name, status) VALUES (?, ?)");
-            $stmt->execute([
-                $data['vehicle_name'], 
-                $data['status'] ?? 'available'
-            ]);
-            echo json_encode(['success' => true, 'message' => 'Vehicle added successfully.', 'id' => $pdo->lastInsertId()]);
-        } else {
+        $data = json_decode(file_get_contents('php://input'), true) ?: [];
+        if (empty($data['vehicle_name']) || empty($data['plate'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Missing required fields']);
+            echo json_encode(['error' => 'Vehicle name and plate number are required.']);
+            exit;
         }
-
+        $stmt = $pdo->prepare('INSERT INTO fleet (vehicle_name, plate, rent_cost, status) VALUES (?, ?, ?, ?)');
+        $stmt->execute([trim($data['vehicle_name']), trim($data['plate']), $data['rent_cost'] ?? 0, $data['status'] ?? 'available']);
+        echo json_encode(['success' => true, 'message' => 'Vehicle added successfully.', 'id' => $pdo->lastInsertId()]);
     } elseif ($method === 'DELETE') {
-        // Delete a vehicle
-        $data = json_decode(file_get_contents('php://input'), true);
-        if(isset($data['id'])) {
-            $stmt = $pdo->prepare("DELETE FROM vehicles WHERE id = ?");
-            $stmt->execute([$data['id']]);
-            echo json_encode(['success' => true, 'message' => 'Vehicle deleted successfully.']);
-        } else {
+        $data = json_decode(file_get_contents('php://input'), true) ?: [];
+        if (empty($data['id'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Missing vehicle ID']);
+            echo json_encode(['error' => 'Missing vehicle ID.']);
+            exit;
         }
+        $stmt = $pdo->prepare('DELETE FROM fleet WHERE id = ?');
+        $stmt->execute([$data['id']]);
+        echo json_encode(['success' => true, 'message' => 'Vehicle deleted successfully.']);
     } else {
         http_response_code(405);
         echo json_encode(['error' => 'Method not allowed']);
     }
-
-} catch(PDOException $e){
+} catch (Throwable $e) {
+    error_log('Fleet API error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
-}
+    echo json_encode(['error' => 'Unable to process fleet data right now.']);
+}

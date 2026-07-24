@@ -27,17 +27,17 @@ include 'includes/sidebar.php';
             <form id="createBookingForm" style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
                 <div style="flex: 2; min-width: 250px;">
                     <label style="display: block; margin-bottom: 5px;">Select Vehicle</label>
-                    <select id="vehicle_id" required style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+                    <select id="fleet_id" required style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
                         <option value="" disabled selected>Loading available vehicles...</option>
                     </select>
                 </div>
                 <div style="flex: 1; min-width: 150px;">
                     <label style="display: block; margin-bottom: 5px;">Pickup Date</label>
-                    <input type="date" id="pickup_date" required style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+                    <input type="date" id="start_date" required style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
                 </div>
                 <div style="flex: 1; min-width: 150px;">
                     <label style="display: block; margin-bottom: 5px;">Return Date</label>
-                    <input type="date" id="return_date" required style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+                    <input type="date" id="end_date" required style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
                 </div>
                 <button type="submit" class="btn" style="padding: 9px 20px; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color);">Book Vehicle</button>
             </form>
@@ -71,7 +71,7 @@ function loadAvailableVehicles() {
     fetch('api/fleet.php')
         .then(response => response.json())
         .then(data => {
-            const select = document.getElementById('vehicle_id');
+            const select = document.getElementById('fleet_id');
             select.innerHTML = '<option value="" disabled selected>Choose a vehicle</option>';
             
             if (data.error) {
@@ -93,7 +93,7 @@ function loadAvailableVehicles() {
             });
         })
         .catch(err => {
-            document.getElementById('vehicle_id').innerHTML = '<option value="" disabled>Failed to load vehicles</option>';
+            document.getElementById('fleet_id').innerHTML = '<option value="" disabled>Failed to load vehicles</option>';
         });
 }
 
@@ -117,9 +117,9 @@ function loadBookings() {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">#${booking.id}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: 500;">${booking.user_name || 'User ' + booking.customer_id}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: 500;">${booking.user_name || 'User ' + booking.user_id}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${booking.vehicle_name}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${booking.pickup_date} to ${booking.return_date}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${booking.start_date} to ${booking.end_date}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
                         <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; background: ${booking.status === 'pending' ? '#f59e0b' : (booking.status === 'confirmed' ? '#3b82f6' : (booking.status === 'completed' ? '#10b981' : '#ef4444'))}; color: white; text-transform: capitalize;">
                             ${booking.status}
@@ -139,13 +139,13 @@ document.getElementById('createBookingForm').addEventListener('submit', function
     const msg = document.getElementById('bookingMessage');
     
     const payload = {
-        customer_id: currentUserId,
-        vehicle_id: document.getElementById('vehicle_id').value,
-        pickup_date: document.getElementById('pickup_date').value,
-        return_date: document.getElementById('return_date').value
+        user_id: currentUserId,
+        fleet_id: document.getElementById('fleet_id').value,
+        start_date: document.getElementById('start_date').value,
+        end_date: document.getElementById('end_date').value
     };
     
-    if (new Date(payload.pickup_date) > new Date(payload.return_date)) {
+    if (new Date(payload.start_date) > new Date(payload.end_date)) {
         msg.innerHTML = '<span style="color: red;">Return date must be after pickup date.</span>';
         return;
     }

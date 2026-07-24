@@ -1,26 +1,26 @@
 <?php
-require_once('../config/db.php');
+require_once __DIR__ . '/../config/db.php';
 header('Content-Type: application/json');
 
 try {
     // Get counts
-    $ticketsStmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status != 'closed'");
+    $ticketsStmt = $pdo->query("SELECT COUNT(*) FROM tickets WHERE status != 'closed'");
     $activeTickets = $ticketsStmt->fetchColumn();
 
     $bookingsStmt = $pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'pending'");
     $pendingBookings = $bookingsStmt->fetchColumn();
 
-    $fleetStmt = $pdo->query("SELECT COUNT(*) FROM vehicles WHERE status = 'available'");
+    $fleetStmt = $pdo->query("SELECT COUNT(*) FROM fleet WHERE status = 'available'");
     $availableFleet = $fleetStmt->fetchColumn();
 
-    $customersStmt = $pdo->query("SELECT COUNT(*) FROM customers");
+    $customersStmt = $pdo->query("SELECT COUNT(*) FROM users");
     $totalCustomers = $customersStmt->fetchColumn();
     
     // Get recent activity (last 5 tickets or bookings)
     // For now we will just return empty or simple DB logic
     $activity = [];
     
-    $recentVehicles = $pdo->query("SELECT id, vehicle_name, created_at FROM vehicles ORDER BY created_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+    $recentVehicles = $pdo->query("SELECT id, vehicle_name, created_at FROM fleet ORDER BY created_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
     foreach($recentVehicles as $v) {
         $activity[] = [
             'icon' => 'fa-car',

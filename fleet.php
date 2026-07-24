@@ -28,7 +28,7 @@ include 'includes/sidebar.php';
                     <label style="display: block; margin-bottom: 5px;">Search & Add Vehicle</label>
                     <input type="text" id="vehicle_name" name="vehicle_name" required style="width: 100%; padding: 8px;" placeholder="e.g. Toyota Camry 2023">
                 </div>
-                <button type="submit" class="btn" style="padding: 10px 20px; height: 35px; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color);">Add Vehicle</button>
+                <div><label style="display: block; margin-bottom: 5px;">Plate Number</label><input type="text" id="plate" required style="width: 100%; padding: 8px;" placeholder="e.g. DL01AB1234"></div><button type="submit" class="btn" style="padding: 10px 20px; height: 35px; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color);">Add Vehicle</button>
             </form>
             <div id="formMessage" style="margin-top: 10px;"></div>
         </div>
@@ -94,6 +94,7 @@ document.getElementById('addVehicleForm').addEventListener('submit', function(e)
     e.preventDefault();
     
     const vehicle_name = document.getElementById('vehicle_name').value;
+    const plate = document.getElementById('plate').value;
     const messageDiv = document.getElementById('formMessage');
     
     fetch('api/fleet.php', {
@@ -101,7 +102,7 @@ document.getElementById('addVehicleForm').addEventListener('submit', function(e)
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ vehicle_name, status: 'available' })
+        body: JSON.stringify({ vehicle_name, plate, status: 'available' })
     })
     .then(response => response.json())
     .then(data => {

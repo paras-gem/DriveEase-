@@ -1,9 +1,9 @@
 <?php
-require_once('../config/db.php');
+require_once __DIR__ . '/../config/db.php';
 header('Content-Type: application/json');
 
 try {
-    $stmt = $pdo->query("SELECT id, name, email, phone, license_number, created_at FROM customers ORDER BY id DESC");
+    $stmt = $pdo->query("SELECT id, name, email, created_at FROM users ORDER BY created_at DESC");
     
     $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($customers);
