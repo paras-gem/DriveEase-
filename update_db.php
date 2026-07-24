@@ -15,14 +15,12 @@ try {
     $createUsersQuery = "
     CREATE TABLE `users` (
         `id`                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        `fullname`          VARCHAR(150)    NOT NULL,
-        `username`          VARCHAR(100)    NOT NULL,
+        `name`              VARCHAR(150)    NOT NULL,
         `email`             VARCHAR(255)    NOT NULL UNIQUE,
         `password`          VARCHAR(255)    DEFAULT NULL,
+        `google_id`         VARCHAR(255)    DEFAULT NULL,
         `security_question` VARCHAR(255)    DEFAULT NULL,
         `security_answer`   VARCHAR(255)    DEFAULT NULL,
-        `provider`          VARCHAR(20)     DEFAULT 'email',
-        `role`              ENUM('admin','agent','customer') DEFAULT 'customer',
         `created_at`        TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ";

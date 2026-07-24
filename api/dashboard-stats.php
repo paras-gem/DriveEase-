@@ -20,12 +20,12 @@ try {
     // For now we will just return empty or simple DB logic
     $activity = [];
     
-    $recentVehicles = $pdo->query("SELECT id, make, model, created_at FROM fleet ORDER BY created_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+    $recentVehicles = $pdo->query("SELECT id, vehicle_name, plate, created_at FROM fleet ORDER BY created_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
     foreach($recentVehicles as $v) {
         $activity[] = [
             'icon' => 'fa-car',
             'title' => 'New Vehicle Added',
-            'desc' => "{$v['make']} {$v['model']} was added to the fleet.",
+            'desc' => "{$v['vehicle_name']} ({$v['plate']}) was added to the fleet.",
             'time' => $v['created_at']
         ];
     }

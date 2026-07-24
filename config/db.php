@@ -4,10 +4,10 @@
 
 // database info
 
-$host = 'sql302.infinityfree.com';
-$db = 'if0_42220998_driveease_db';
-$user = 'if0_42220998';
-$pass = 'GDrive2026';
+$host = 'localhost';
+$db = 'driveease_db';
+$user = 'root';
+$pass = '';
 
 
 // DSN: Data source name: it tells that where the host is located 
