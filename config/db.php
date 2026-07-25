@@ -27,5 +27,9 @@ try {
 
     // echo connected to the database successfully
 } catch(PDOException $e){
-    die("Database connection failed: " . $e->getMessage()); 
+    if (!headers_sent()) {
+        header('Content-Type: application/json');
+    }
+    echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . $e->getMessage()]);
+    exit;
 }
