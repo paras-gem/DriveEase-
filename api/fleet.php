@@ -131,11 +131,15 @@ try {
     } elseif ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true) ?: [];
 
-        if (empty($data['car_label']) || !isset($data['rent_cost_per_day'])) {
+        if (empty($data['car_label'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'car_label and rent_cost_per_day are required.']);
+            echo json_encode(['error' => 'car_label is required.']);
             exit;
         }
+
+        // Auto-calculate a rent cost based on the year (e.g., $40 base + $3 for every year after 2000)
+        $year = isset($data['car_api_year']) ? (int)$data['car_api_year'] : 2020;
+        $calculated_cost = 40 + max(0, ($year - 2000) * 3);
 
         // Auto-generate a random plate if not provided
         $plate = !empty($data['plate']) ? trim($data['plate']) : 'DRIVE-' . strtoupper(substr(uniqid(), -5));
@@ -148,7 +152,7 @@ try {
             $data['car_api_year']       ?? null,
             trim($data['car_label']),
             $plate,
-            (float) $data['rent_cost_per_day'],
+            $calculated_cost,
             $data['status'] ?? 'available',
         ]);
 

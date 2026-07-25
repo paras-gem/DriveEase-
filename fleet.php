@@ -48,11 +48,7 @@ include 'includes/sidebar.php';
                         <option value="" disabled selected>Select Model First</option>
                     </select>
                 </div>
-                <div>
-                    <label style="display: block; margin-bottom: 5px;">Cost</label>
-                    <input type="number" id="rent_cost" required min="0" step="0.01" style="width: 100%; padding: 8px;" placeholder="e.g. 50">
-                </div>
-                <button type="submit" class="btn" style="padding: 10px; height: 35px; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color);">Add Vehicle</button>
+                <button type="submit" class="btn" style="padding: 10px; height: 35px; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); grid-column: span 2;">Add Vehicle</button>
             </form>
             <div id="formMessage" style="margin-top: 10px;"></div>
         </div>
@@ -206,7 +202,6 @@ document.getElementById('addVehicleForm').addEventListener('submit', function(e)
     const trimText = document.getElementById('car_trim').options[document.getElementById('car_trim').selectedIndex].text;
     
     const car_label = `${year} ${makeText} ${modelText} ${trimText}`;
-    const rent_cost = document.getElementById('rent_cost').value;
     const messageDiv = document.getElementById('formMessage');
     
     fetch('api/fleet.php', {
@@ -216,7 +211,6 @@ document.getElementById('addVehicleForm').addEventListener('submit', function(e)
             car_label: car_label,
             car_api_trim_id: trimId,
             car_api_year: year,
-            rent_cost_per_day: rent_cost,
             status: 'available' 
         })
     })
