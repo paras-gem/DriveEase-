@@ -130,11 +130,14 @@ try {
     } elseif ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true) ?: [];
 
-        if (empty($data['car_label']) || empty($data['plate']) || !isset($data['rent_cost_per_day'])) {
+        if (empty($data['car_label']) || !isset($data['rent_cost_per_day'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'car_label, plate, and rent_cost_per_day are required.']);
+            echo json_encode(['error' => 'car_label and rent_cost_per_day are required.']);
             exit;
         }
+
+        // Auto-generate a random plate if not provided
+        $plate = !empty($data['plate']) ? trim($data['plate']) : 'DRIVE-' . strtoupper(substr(uniqid(), -5));
 
         $pdo->prepare("
             INSERT INTO fleet (car_api_trim_id, car_api_year, car_label, plate, rent_cost_per_day, status)
@@ -143,7 +146,7 @@ try {
             $data['car_api_trim_id']   ?? null,
             $data['car_api_year']       ?? null,
             trim($data['car_label']),
-            trim($data['plate']),
+            $plate,
             (float) $data['rent_cost_per_day'],
             $data['status'] ?? 'available',
         ]);

@@ -57,8 +57,8 @@ include 'includes/sidebar.php';
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">User</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Subject</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Priority</th>
-                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Status</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Date</th>
+                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="ticketsTableBody">
@@ -99,8 +99,11 @@ function loadTickets() {
                         <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; background: ${ticket.status === 'open' ? '#3b82f6' : (ticket.status === 'resolved' ? '#10b981' : '#f59e0b')}; color: white;">
                             ${ticket.status}
                         </span>
-                    </td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${new Date(ticket.created_at).toLocaleDateString()}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
+                        <button onclick="openComments(${ticket.id}, '${ticket.subject.replace(/'/g, "\\'")}')" class="btn" style="background: var(--sidebar-hover); color: white; border: none; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-right: 5px;">Comments</button>
+                        ${ticket.status !== 'resolved' && ticket.status !== 'closed' ? `<button onclick="resolveTicket(${ticket.id})" class="btn" style="background: #10b981; color: white; border: none; padding: 4px 8px; font-size: 12px; cursor: pointer;">Resolve</button>` : ''}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -141,7 +144,114 @@ document.getElementById('createTicketForm').addEventListener('submit', function(
     });
 });
 
+function resolveTicket(id) {
+    if (!confirm("Are you sure you want to mark this ticket as resolved?")) return;
+    fetch('api/tickets.php', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, status: 'resolved' })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            loadTickets();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+}
+
+// Comments logic
+let currentTicketId = null;
+
+function openComments(id, subject) {
+    currentTicketId = id;
+    document.getElementById('commentsModal').style.display = 'block';
+    document.getElementById('commentsTicketSubject').textContent = subject;
+    loadComments();
+}
+
+function closeComments() {
+    document.getElementById('commentsModal').style.display = 'none';
+    currentTicketId = null;
+}
+
+function loadComments() {
+    const list = document.getElementById('commentsList');
+    list.innerHTML = '<div style="text-align: center; padding: 10px;">Loading comments...</div>';
+    
+    fetch(`api/tickets.php?action=comments&ticket_id=${currentTicketId}`)
+        .then(r => r.json())
+        .then(data => {
+            list.innerHTML = '';
+            if (data.error) {
+                list.innerHTML = `<div style="color: red;">Error: ${data.error}</div>`;
+                return;
+            }
+            if (data.length === 0) {
+                list.innerHTML = `<div style="text-align: center; color: var(--text-secondary); padding: 10px;">No comments yet.</div>`;
+                return;
+            }
+            data.forEach(c => {
+                const author = c.customer_name ? c.customer_name : (c.employee_name ? c.employee_name + ' (Staff)' : 'Unknown');
+                const isMe = c.customer_id == currentUserId;
+                const div = document.createElement('div');
+                div.style.marginBottom = '10px';
+                div.style.padding = '10px';
+                div.style.borderRadius = '8px';
+                div.style.background = isMe ? 'rgba(59, 130, 246, 0.1)' : 'var(--bg-color)';
+                div.style.border = '1px solid var(--border-color)';
+                div.innerHTML = `
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">
+                        <strong>${author}</strong> &bull; ${new Date(c.created_at).toLocaleString()}
+                    </div>
+                    <div>${c.comment}</div>
+                `;
+                list.appendChild(div);
+            });
+            list.scrollTop = list.scrollHeight;
+        });
+}
+
+document.getElementById('addCommentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!currentTicketId) return;
+    const commentInput = document.getElementById('newComment');
+    const comment = commentInput.value;
+    
+    fetch('api/tickets.php?action=comment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticket_id: currentTicketId, user_id: currentUserId, comment: comment })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            commentInput.value = '';
+            loadComments();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+});
+
 document.addEventListener("DOMContentLoaded", loadTickets);
 </script>
+
+<!-- Comments Modal -->
+<div id="commentsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+            <h3 style="margin: 0;">Ticket Comments: <span id="commentsTicketSubject" style="font-weight: normal; font-size: 16px;"></span></h3>
+            <button onclick="closeComments()" style="background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-primary);">&times;</button>
+        </div>
+        <div id="commentsList" style="flex: 1; overflow-y: auto; margin-bottom: 15px; min-height: 150px;">
+        </div>
+        <form id="addCommentForm" style="display: flex; gap: 10px;">
+            <input type="text" id="newComment" required placeholder="Type your reply..." style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+            <button type="submit" class="btn" style="padding: 8px 15px; background: var(--sidebar-hover); color: white; border: none; cursor: pointer;">Send</button>
+        </form>
+    </div>
+</div>
 
 <?php include 'includes/footer.php'; ?>
