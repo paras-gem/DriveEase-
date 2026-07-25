@@ -6,10 +6,10 @@ $method = $_SERVER['REQUEST_METHOD'];
 try {
     if ($method === 'GET') {
         $stmt = $pdo->query("
-            SELECT b.*, u.name AS user_name, f.vehicle_name 
+            SELECT b.*, u.name AS user_name, f.car_label AS vehicle_name, f.plate, f.rent_cost_per_day
             FROM bookings b 
             LEFT JOIN customers u ON b.customer_id = u.id 
-            LEFT JOIN vehicles f ON b.vehicle_id = f.id 
+            LEFT JOIN fleet f ON b.fleet_id = f.id 
             ORDER BY b.created_at DESC
         ");
         $results = $stmt->fetchAll();
@@ -20,13 +20,13 @@ try {
     } elseif ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true) ?: [];
         $customer_id = $data['customer_id'] ?? $data['user_id'] ?? null;
-        $vehicle_id = $data['vehicle_id'] ?? $data['fleet_id'] ?? null;
+        $fleet_id = $data['fleet_id'] ?? null;
         $start_date = $data['start_date'] ?? null;
         $end_date = $data['end_date'] ?? null;
 
-        if (!$customer_id || !$vehicle_id || !$start_date || !$end_date) { 
+        if (!$customer_id || !$fleet_id || !$start_date || !$end_date) { 
             http_response_code(400); 
-            echo json_encode(['error' => 'Missing required booking details.']); 
+            echo json_encode(['error' => 'Missing required booking details. (customer_id, fleet_id, start_date, end_date)']); 
             exit; 
         }
         if ($start_date > $end_date) { 
@@ -34,10 +34,26 @@ try {
             echo json_encode(['error' => 'End date must be after the start date.']); 
             exit; 
         }
+
+        // Calculate total cost from fleet's daily rate
+        $fleetRow = $pdo->prepare("SELECT rent_cost_per_day FROM fleet WHERE id = ? AND status = 'available'");
+        $fleetRow->execute([$fleet_id]);
+        $car = $fleetRow->fetch();
+        if (!$car) {
+            http_response_code(409);
+            echo json_encode(['error' => 'This vehicle is not available for booking.']);
+            exit;
+        }
+        $days = (int) round((strtotime($end_date) - strtotime($start_date)) / 86400) + 1;
+        $total_cost = round($car['rent_cost_per_day'] * $days, 2);
         
-        $stmt = $pdo->prepare("INSERT INTO bookings (customer_id, vehicle_id, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$customer_id, $vehicle_id, $start_date, $end_date, 'pending']);
-        echo json_encode(['success' => true, 'message' => 'Booking created successfully!']);
+        $stmt = $pdo->prepare("INSERT INTO bookings (customer_id, fleet_id, start_date, end_date, total_cost, status) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$customer_id, $fleet_id, $start_date, $end_date, $total_cost, 'pending']);
+        
+        // Mark fleet car as booked
+        $pdo->prepare("UPDATE fleet SET status = 'booked' WHERE id = ?")->execute([$fleet_id]);
+        
+        echo json_encode(['success' => true, 'message' => 'Booking created successfully!', 'total_cost' => $total_cost]);
     } else { 
         http_response_code(405); 
         echo json_encode(['error' => 'Method not allowed']); 

@@ -9,7 +9,7 @@ try {
 
     $activity = [];
     
-    foreach ($pdo->query("SELECT vehicle_name, created_at FROM vehicles ORDER BY created_at DESC LIMIT 3")->fetchAll() as $vehicle) {
+    foreach ($pdo->query("SELECT car_label AS vehicle_name, created_at FROM fleet ORDER BY created_at DESC LIMIT 3")->fetchAll() as $vehicle) {
         $activity[] = ['icon' => 'fa-car', 'title' => 'New Vehicle Added', 'desc' => $vehicle['vehicle_name'] . ' was added to the fleet.', 'time' => $vehicle['created_at']];
     }
     
@@ -24,7 +24,7 @@ try {
         'stats' => [
             'tickets' => $count('support_tickets', "status != 'closed'"), 
             'bookings' => $count('bookings', "status = 'pending'"), 
-            'fleet' => $count('vehicles', "status = 'available'")
+            'fleet' => $count('fleet', "status = 'available'")
         ], 
         'activity' => array_slice($activity, 0, 4)
     ]);
