@@ -7,11 +7,12 @@ $method = $_SERVER['REQUEST_METHOD'];
 try {
     if ($method === 'GET') {
         // Fetch all bookings with user and vehicle details
+        // Schema: bookings(id, user_id, fleet_id, start_date, end_date, status, created_at)
         $stmt = $pdo->query("
             SELECT b.*, u.name as user_name, f.vehicle_name 
             FROM bookings b 
-            LEFT JOIN users u ON b.customer_id = u.id 
-            LEFT JOIN vehicles f ON b.vehicle_id = f.id
+            LEFT JOIN users u ON b.user_id = u.id 
+            LEFT JOIN fleet f ON b.fleet_id = f.id
             ORDER BY b.created_at DESC
         ");
         $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -20,14 +21,19 @@ try {
     } elseif ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        if (isset($data['customer_id'], $data['vehicle_id'], $data['pickup_date'], $data['return_date'])) {
-            $stmt = $pdo->prepare("INSERT INTO bookings (customer_id, vehicle_id, pickup_date, return_date, total_amount, status) VALUES (?, ?, ?, ?, ?, ?)");
+        // Map frontend fields to database columns
+        $user_id = $data['customer_id'] ?? $data['user_id'] ?? null;
+        $fleet_id = $data['vehicle_id'] ?? $data['fleet_id'] ?? null;
+        $start_date = $data['pickup_date'] ?? $data['start_date'] ?? null;
+        $end_date = $data['return_date'] ?? $data['end_date'] ?? null;
+
+        if ($user_id && $fleet_id && $start_date && $end_date) {
+            $stmt = $pdo->prepare("INSERT INTO bookings (user_id, fleet_id, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([
-                $data['customer_id'],
-                $data['vehicle_id'],
-                $data['pickup_date'],
-                $data['return_date'],
-                0.00,
+                $user_id,
+                $fleet_id,
+                $start_date,
+                $end_date,
                 'pending'
             ]);
             echo json_encode(['success' => true, 'message' => 'Booking created successfully!']);
