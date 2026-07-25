@@ -122,26 +122,49 @@ try {
     if (isset($_POST['email']) && isset($_POST['password'])) {
         $email = trim($_POST['email']);
         $password = trim($_POST['password']);
+        $role = isset($_POST['role']) ? trim($_POST['role']) : 'customer';
 
-        // Check if user exists
-        $stmt = $pdo->prepare('SELECT * FROM customers WHERE email = :email');
-        $stmt->execute(['email' => $email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($role === 'employee') {
+            // Employee login - check employees table
+            $stmt = $pdo->prepare('SELECT * FROM employees WHERE email = :email');
+            $stmt->execute(['email' => $email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Verify the password securely
-        if ($user && password_verify($password, $user['password'])) {
-            session_regenerate_id(true);
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['name'] ?? 'User'; // use name if available
-            
+            if ($user && password_verify($password, $user['password'])) {
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['name'] ?? 'Employee';
+                $_SESSION['role'] = 'employee';
+                
+                ob_end_clean();
+                echo json_encode(['success' => true, 'message' => 'Employee login successful! Redirecting...']);
+                exit;
+            }
+
             ob_end_clean();
-            echo json_encode(['success' => true, 'message' => 'Login successful! Redirecting...']);
+            echo json_encode(['success' => false, 'message' => 'Invalid employee email or password.']);
+            exit;
+        } else {
+            // Customer login - check customers table
+            $stmt = $pdo->prepare('SELECT * FROM customers WHERE email = :email');
+            $stmt->execute(['email' => $email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user && password_verify($password, $user['password'])) {
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['name'] ?? 'User';
+                $_SESSION['role'] = 'customer';
+                
+                ob_end_clean();
+                echo json_encode(['success' => true, 'message' => 'Login successful! Redirecting...']);
+                exit;
+            }
+
+            ob_end_clean();
+            echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
             exit;
         }
-
-        ob_end_clean();
-        echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
-        exit;
     }
     
     // Fallback if POST array is empty

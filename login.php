@@ -34,6 +34,12 @@
         <!-- Alert Container for AJAX Responses -->
         <div id="ajaxAlert" class="auth-alert" style="display: none;" role="alert"></div>
 
+        <!-- Role Toggle -->
+        <div style="display: flex; background: var(--input-bg); border-radius: var(--r-sm); overflow: hidden; margin-bottom: 24px; border: 1px solid var(--border);">
+            <button type="button" id="roleCustomer" class="role-tab active" onclick="setRole('customer')" style="flex: 1; padding: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.3s; font-family: 'Inter', sans-serif; background: var(--accent-gradient); color: #fff;">Customer</button>
+            <button type="button" id="roleEmployee" class="role-tab" onclick="setRole('employee')" style="flex: 1; padding: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.3s; font-family: 'Inter', sans-serif; background: transparent; color: var(--txt-2);">Employee</button>
+        </div>
+
         <!-- Traditional Login Form (AJAX attached below) -->
         <form class="auth-form" id="loginForm" novalidate>
             <div class="form-group">
@@ -52,8 +58,8 @@
             </button>
         </form>
 
-        <!-- Social Login -->
-        <div class="auth-social">
+        <!-- Social Login (only for customers) -->
+        <div class="auth-social" id="socialLogin">
             <div class="auth-divider">Or continue with</div>
             <div id="googleButton" class="google-button-shell"></div>
             <div class="auth-alert auth-alert--error" id="googleLoadError" role="alert" style="display:none;">Google sign-in could not load. Please try email and password.</div>
@@ -63,6 +69,30 @@
             New here? <a href="signup.php">Create an account</a>
         </div>
     </div>
+
+    <script>
+    let currentRole = 'customer';
+    function setRole(role) {
+        currentRole = role;
+        const custBtn = document.getElementById('roleCustomer');
+        const empBtn = document.getElementById('roleEmployee');
+        const socialLogin = document.getElementById('socialLogin');
+        
+        if (role === 'employee') {
+            empBtn.style.background = 'var(--accent-gradient)';
+            empBtn.style.color = '#fff';
+            custBtn.style.background = 'transparent';
+            custBtn.style.color = 'var(--txt-2)';
+            socialLogin.style.display = 'none';
+        } else {
+            custBtn.style.background = 'var(--accent-gradient)';
+            custBtn.style.color = '#fff';
+            empBtn.style.background = 'transparent';
+            empBtn.style.color = 'var(--txt-2)';
+            socialLogin.style.display = 'block';
+        }
+    }
+    </script>
 
     <!-- Google Identity API script -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -167,6 +197,7 @@
 
             // Gather inputs
             const formData = new FormData(loginForm);
+            formData.append('role', currentRole);
 
             // Execute POST request to backend
             fetch('includes/login_process.php', {

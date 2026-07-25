@@ -57,12 +57,13 @@ include 'includes/sidebar.php';
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">User</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Subject</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Priority</th>
+                        <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Status</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Date</th>
                         <th style="padding: 10px; border-bottom: 1px solid var(--border-color);">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="ticketsTableBody">
-                    <tr><td colspan="6" style="text-align: center; padding: 20px;">Loading tickets...</td></tr>
+                    <tr><td colspan="7" style="text-align: center; padding: 20px;">Loading tickets...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -84,7 +85,7 @@ function loadTickets() {
             const jsonStart = text.indexOf('[');
             const jsonStartObj = text.indexOf('{');
             if (jsonStart === -1 && jsonStartObj === -1) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No tickets found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No tickets found.</td></tr>`;
                 return;
             }
             const start = jsonStart !== -1 && (jsonStartObj === -1 || jsonStart < jsonStartObj) ? jsonStart : jsonStartObj;
@@ -92,21 +93,22 @@ function loadTickets() {
             
             let data;
             try { data = JSON.parse(jsonStr); } catch(e) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No tickets found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No tickets found.</td></tr>`;
                 return;
             }
             
             if (data.error) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Error: ${data.error}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Error: ${data.error}</td></tr>`;
                 return;
             }
             if (!Array.isArray(data) || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No tickets found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No tickets found.</td></tr>`;
                 return;
             }
             
             data.forEach(ticket => {
                 const tr = document.createElement('tr');
+                const safeSubject = (ticket.subject || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 tr.innerHTML = `
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">#${ticket.id}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: 500;">${ticket.user_name || 'User ' + ticket.customer_id}</td>
@@ -116,9 +118,10 @@ function loadTickets() {
                         <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; background: ${ticket.status === 'open' ? '#3b82f6' : (ticket.status === 'resolved' ? '#10b981' : '#f59e0b')}; color: white;">
                             ${ticket.status}
                         </span>
+                    </td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${new Date(ticket.created_at).toLocaleDateString()}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
-                        <button onclick="openComments(${ticket.id}, '${ticket.subject.replace(/'/g, "\\\\'")}')" class="btn" style="background: var(--sidebar-hover); color: white; border: none; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-right: 5px;">Comments</button>
+                        <button onclick="openComments(${ticket.id}, '${safeSubject}')" class="btn" style="background: var(--sidebar-hover); color: white; border: none; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-right: 5px;">Comments</button>
                         ${ticket.status !== 'resolved' && ticket.status !== 'closed' ? `<button onclick="resolveTicket(${ticket.id})" class="btn" style="background: #10b981; color: white; border: none; padding: 4px 8px; font-size: 12px; cursor: pointer;">Resolve</button>` : ''}
                     </td>
                 `;
@@ -126,7 +129,7 @@ function loadTickets() {
             });
         })
         .catch(err => {
-            document.getElementById('ticketsTableBody').innerHTML = `<tr><td colspan="6" style="text-align: center;">No tickets found.</td></tr>`;
+            document.getElementById('ticketsTableBody').innerHTML = `<tr><td colspan="7" style="text-align: center;">No tickets found.</td></tr>`;
         });
 }
 
