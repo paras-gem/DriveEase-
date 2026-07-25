@@ -9,6 +9,7 @@
  * POST /api/fleet.php             → Add a car to our fleet (body: car_api_trim_id, car_api_year, car_label, plate, rent_cost_per_day, status)
  * DELETE /api/fleet.php           → Remove a car from our fleet (body: id)
  */
+ini_set('display_errors', 0);
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/carapi.php';
 header('Content-Type: application/json');

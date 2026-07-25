@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 0); // Disable HTML errors to prevent breaking JSON
 require_once __DIR__ . '/../config/db.php';
 header('Content-Type: application/json');
 $method = $_SERVER['REQUEST_METHOD'];
