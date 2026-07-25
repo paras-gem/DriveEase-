@@ -42,10 +42,6 @@ include 'includes/sidebar.php';
             <span class="stat-label">Available Fleet</span>
             <span class="stat-value" id="stat-fleet">...</span>
         </div>
-        <div class="stat-card">
-            <span class="stat-label">Total Customers</span>
-            <span class="stat-value" id="stat-customers">...</span>
-        </div>
     </div>
 
     <div class="content-grid">
@@ -77,7 +73,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById('stat-tickets').textContent = data.stats.tickets;
                 document.getElementById('stat-bookings').textContent = data.stats.bookings;
                 document.getElementById('stat-fleet').textContent = data.stats.fleet;
-                document.getElementById('stat-customers').textContent = data.stats.customers;
                 
                 // Update activity
                 const activityList = document.getElementById('recent-activity-list');

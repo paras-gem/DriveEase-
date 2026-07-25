@@ -46,7 +46,7 @@ if ($password !== $confirm_password) {
 
 try {
     // 8. Check email uniqueness (prevent duplicate registrations)
-    $stmt = $pdo->prepare('SELECT id FROM users WHERE email = :email');
+    $stmt = $pdo->prepare('SELECT id FROM customers WHERE email = :email');
     $stmt->execute(['email' => $email]);
     if ($stmt->fetch()) {
         // If an ID is returned, the email is already in the database
@@ -60,7 +60,7 @@ try {
 
     // 10. Prepare the INSERT statement for the new user record
     $insertStmt = $pdo->prepare('
-        INSERT INTO users (name, email, password, security_question, security_answer)
+        INSERT INTO customers (name, email, password, security_question, security_answer)
         VALUES (:name, :email, :password, :security_question, :security_answer)
     ');
 

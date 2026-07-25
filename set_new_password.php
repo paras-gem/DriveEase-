@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Passwords do not match.';
     } else {
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = $pdo->prepare('UPDATE users SET password = :password WHERE id = :id');
+        $stmt = $pdo->prepare('UPDATE customers SET password = :password WHERE id = :id');
         $stmt->execute([
             'password' => $passwordHash,
             'id' => $resetUserId,

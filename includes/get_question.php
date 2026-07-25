@@ -34,7 +34,7 @@ if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 // Look up the user's security question by email
-$stmt = $pdo->prepare('SELECT id, security_question FROM users WHERE email = :email');
+$stmt = $pdo->prepare('SELECT id, security_question FROM customers WHERE email = :email');
 $stmt->execute(['email' => $email]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

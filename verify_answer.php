@@ -19,7 +19,7 @@ if ($userId <= 0 || $answer === '') {
     exit;
 }
 
-$stmt = $pdo->prepare('SELECT id, security_answer FROM users WHERE id = :id');
+$stmt = $pdo->prepare('SELECT id, security_answer FROM customers WHERE id = :id');
 $stmt->execute(['id' => $userId]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

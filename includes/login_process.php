@@ -84,14 +84,14 @@ try {
             $email = $payload['email'];
             $name = $payload['name'] ?? $email;
 
-            $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
+            $stmt = $pdo->prepare('SELECT * FROM customers WHERE email = :email');
             $stmt->execute(['email' => $email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             // If user doesn't exist, create them using Google profile data
             if (!$user) {
                 $stmt = $pdo->prepare(
-                    "INSERT INTO users (name, email, google_id)
+                    "INSERT INTO customers (name, email, google_id)
                      VALUES (:name, :email, :google_id)"
                 );
                 // Payload 'sub' contains the Google unique ID
@@ -124,7 +124,7 @@ try {
         $password = trim($_POST['password']);
 
         // Check if user exists
-        $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
+        $stmt = $pdo->prepare('SELECT * FROM customers WHERE email = :email');
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
