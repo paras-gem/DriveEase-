@@ -19,5 +19,5 @@ try {
 } catch (Throwable $e) {
     error_log('Tickets API error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Ticket data is not available yet.']);
+    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
 }

@@ -35,5 +35,5 @@ try {
 } catch (Throwable $e) {
     error_log('Fleet API error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Fleet data is not available yet.']);
+    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
 }
