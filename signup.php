@@ -181,20 +181,17 @@
                 alertBox.innerHTML = data.message;
 
                 if (data.success) {
-                    // Success: Add success styling and show a clear continue button
+                    // Success: Add success styling and redirect user
                     alertBox.classList.add('auth-alert--success');
-                    alertBox.innerHTML = `
-                        <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center;">
-                            <span>${data.message}</span>
-                            <a href="login.php" class="btn-primary" style="text-decoration: none; width: auto; padding: 10px 24px; font-size: 14px;">Continue to Login</a>
-                        </div>
-                    `;
-                    
-                    // Hide the form to make the success message and button prominent
-                    signupForm.style.display = 'none';
+                    alertBox.innerHTML += ' <a href="login.php">Sign in</a>';
                     
                     // Reset form fields
                     signupForm.reset();
+                    
+                    // Redirect to login page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'login.php';
+                    }, 2000);
                 } else {
                     // Failure: Add error styling
                     alertBox.classList.add('auth-alert--error');
