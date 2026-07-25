@@ -13,11 +13,7 @@
                 <i class="fa-solid fa-ticket"></i> Support Tickets
             </a>
         </li>
-        <li>
-            <a href="fleet.php" class="nav-item">
-                <i class="fa-solid fa-car"></i> Fleet
-            </a>
-        </li>
+
         <li>
             <a href="bookings.php" class="nav-item">
                 <i class="fa-solid fa-book-open"></i> Bookings

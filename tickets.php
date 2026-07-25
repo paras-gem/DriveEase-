@@ -235,7 +235,8 @@ document.getElementById('addCommentForm').addEventListener('submit', function(e)
     });
 });
 
-document.addEventListener("DOMContentLoaded", loadTickets);
+// Initial fetch
+loadTickets();
 </script>
 
 <!-- Comments Modal -->

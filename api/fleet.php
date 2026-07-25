@@ -126,7 +126,7 @@ try {
             ];
         }, $fleet);
 
-        echo json_encode(['success' => true, 'data' => $result]);
+        echo json_encode($result);
 
     } elseif ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true) ?: [];
