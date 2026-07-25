@@ -102,4 +102,15 @@ CREATE TABLE `ticket_comments` (
     FOREIGN KEY (`employee_id`) REFERENCES `employees`(`id`)       ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 9. FEEDBACK
+CREATE TABLE `feedback` (
+    `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `customer_id` INT UNSIGNED  NOT NULL,
+    `type`        ENUM('feedback','feature','issue','help') DEFAULT 'feedback',
+    `subject`     VARCHAR(255)  NOT NULL,
+    `description` TEXT          NOT NULL,
+    `created_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;

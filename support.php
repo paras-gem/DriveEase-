@@ -30,25 +30,25 @@ include 'includes/sidebar.php';
             <form id="supportForm" style="display: flex; flex-direction: column; gap: 16px;">
                 <div>
                     <label style="display: block; margin-bottom: 6px; font-weight: 500;">Type of Request</label>
-                    <select id="type" name="type" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-primary);">
-                        <option value="feedback">General Feedback</option>
-                        <option value="feature">Suggest a Feature</option>
-                        <option value="issue">Report an Issue / Bug</option>
-                        <option value="help">Need Help</option>
+                    <select id="type" name="type" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg, var(--bg-color)); color: var(--text-primary); font-size: 14px; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M7%207l3%203%203-3%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;">
+                        <option value="feedback">🗣️ General Feedback</option>
+                        <option value="feature">💡 Suggest a Feature</option>
+                        <option value="issue">🐛 Report an Issue / Bug</option>
+                        <option value="help">🆘 Need Help</option>
                     </select>
                 </div>
                 
                 <div>
                     <label style="display: block; margin-bottom: 6px; font-weight: 500;">Subject</label>
-                    <input type="text" id="subject" name="subject" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-primary);" placeholder="Brief summary of your request">
+                    <input type="text" id="subject" name="subject" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg, var(--bg-color)); color: var(--text-primary); font-size: 14px; transition: border-color 0.2s, box-shadow 0.2s;" placeholder="Brief summary of your request">
                 </div>
                 
                 <div>
                     <label style="display: block; margin-bottom: 6px; font-weight: 500;">Description</label>
-                    <textarea id="description" name="description" rows="5" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-primary); resize: vertical;" placeholder="Provide as much detail as possible..."></textarea>
+                    <textarea id="description" name="description" rows="5" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg, var(--bg-color)); color: var(--text-primary); font-size: 14px; resize: vertical; transition: border-color 0.2s, box-shadow 0.2s;" placeholder="Provide as much detail as possible..."></textarea>
                 </div>
                 
-                <button type="submit" class="btn" style="padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
+                <button type="submit" id="submitBtn" class="btn" style="padding: 12px; background: var(--sidebar-hover, #6366f1); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; font-size: 14px;">
                     Submit Request
                 </button>
                 <div id="supportMessage" style="margin-top: 10px; font-weight: 500; text-align: center;"></div>
@@ -57,26 +57,74 @@ include 'includes/sidebar.php';
     </div>
 </main>
 
+<style>
+    #supportForm select:focus,
+    #supportForm input:focus,
+    #supportForm textarea:focus {
+        outline: none;
+        border-color: var(--sidebar-hover, #6366f1);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+    #supportForm select:hover,
+    #supportForm input:hover,
+    #supportForm textarea:hover {
+        border-color: var(--sidebar-hover, #6366f1);
+    }
+    #submitBtn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+    #submitBtn:active {
+        transform: translateY(0);
+    }
+</style>
+
 <script>
+const currentUserId = <?php echo $_SESSION['user_id']; ?>;
+
 document.getElementById('supportForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    const btn = this.querySelector('button');
+    const btn = document.getElementById('submitBtn');
     const msg = document.getElementById('supportMessage');
     
     btn.style.opacity = '0.7';
     btn.textContent = 'Submitting...';
+    btn.disabled = true;
     
-    // Simulate API request
-    setTimeout(() => {
-        msg.style.color = 'green';
-        msg.innerHTML = '<i class="fa-solid fa-circle-check"></i> Thank you! Your request has been received and our team will review it shortly.';
-        this.reset();
+    const payload = {
+        user_id: currentUserId,
+        type: document.getElementById('type').value,
+        subject: document.getElementById('subject').value,
+        description: document.getElementById('description').value
+    };
+    
+    fetch('api/feedback.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            msg.style.color = '#10b981';
+            msg.innerHTML = '<i class="fa-solid fa-circle-check"></i> Thank you! Your feedback has been saved and our team will review it shortly.';
+            this.reset();
+        } else {
+            msg.style.color = '#ef4444';
+            msg.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Error: ' + (data.error || 'Something went wrong.');
+        }
         btn.style.opacity = '1';
         btn.textContent = 'Submit Request';
-        
-        // Hide message after 5 seconds
+        btn.disabled = false;
         setTimeout(() => msg.innerHTML = '', 5000);
-    }, 1500);
+    })
+    .catch(err => {
+        msg.style.color = '#ef4444';
+        msg.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Failed to submit. Please try again.';
+        btn.style.opacity = '1';
+        btn.textContent = 'Submit Request';
+        btn.disabled = false;
+    });
 });
 </script>
 

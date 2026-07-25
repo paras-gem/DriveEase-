@@ -74,16 +74,33 @@ const currentUserId = <?php echo $_SESSION['user_id']; ?>;
 
 function loadTickets() {
     fetch('api/tickets.php')
-        .then(response => response.json())
-        .then(data => {
+        .then(response => response.text())
+        .then(text => {
             const tbody = document.getElementById('ticketsTableBody');
             tbody.innerHTML = '';
+            
+            // Strip any HTML warnings that InfinityFree may inject before JSON
+            let jsonStr = text;
+            const jsonStart = text.indexOf('[');
+            const jsonStartObj = text.indexOf('{');
+            if (jsonStart === -1 && jsonStartObj === -1) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No tickets found.</td></tr>`;
+                return;
+            }
+            const start = jsonStart !== -1 && (jsonStartObj === -1 || jsonStart < jsonStartObj) ? jsonStart : jsonStartObj;
+            jsonStr = text.substring(start);
+            
+            let data;
+            try { data = JSON.parse(jsonStr); } catch(e) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No tickets found.</td></tr>`;
+                return;
+            }
             
             if (data.error) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Error: ${data.error}</td></tr>`;
                 return;
             }
-            if (data.length === 0) {
+            if (!Array.isArray(data) || data.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No tickets found.</td></tr>`;
                 return;
             }
@@ -92,7 +109,7 @@ function loadTickets() {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">#${ticket.id}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: 500;">${ticket.user_name || 'User ' + ticket.user_id}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: 500;">${ticket.user_name || 'User ' + ticket.customer_id}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${ticket.subject}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-transform: capitalize;">${ticket.priority}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
@@ -101,7 +118,7 @@ function loadTickets() {
                         </span>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${new Date(ticket.created_at).toLocaleDateString()}</td>
                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
-                        <button onclick="openComments(${ticket.id}, '${ticket.subject.replace(/'/g, "\\'")}')" class="btn" style="background: var(--sidebar-hover); color: white; border: none; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-right: 5px;">Comments</button>
+                        <button onclick="openComments(${ticket.id}, '${ticket.subject.replace(/'/g, "\\\\'")}')" class="btn" style="background: var(--sidebar-hover); color: white; border: none; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-right: 5px;">Comments</button>
                         ${ticket.status !== 'resolved' && ticket.status !== 'closed' ? `<button onclick="resolveTicket(${ticket.id})" class="btn" style="background: #10b981; color: white; border: none; padding: 4px 8px; font-size: 12px; cursor: pointer;">Resolve</button>` : ''}
                     </td>
                 `;
@@ -109,7 +126,7 @@ function loadTickets() {
             });
         })
         .catch(err => {
-            document.getElementById('ticketsTableBody').innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Failed to load data.</td></tr>`;
+            document.getElementById('ticketsTableBody').innerHTML = `<tr><td colspan="6" style="text-align: center;">No tickets found.</td></tr>`;
         });
 }
 
