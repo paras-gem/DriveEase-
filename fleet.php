@@ -49,7 +49,7 @@ include 'includes/sidebar.php';
                     </select>
                 </div>
                 <div>
-                    <label style="display: block; margin-bottom: 5px;">Daily Cost ($)</label>
+                    <label style="display: block; margin-bottom: 5px;">Cost</label>
                     <input type="number" id="rent_cost" required min="0" step="0.01" style="width: 100%; padding: 8px;" placeholder="e.g. 50">
                 </div>
                 <button type="submit" class="btn" style="padding: 10px; height: 35px; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color);">Add Vehicle</button>
