@@ -48,10 +48,11 @@ body {
     color: var(--txt-1); 
     min-height: 100vh; 
     display: flex; 
-    align-items: center; 
-    justify-content: center; 
+    flex-direction: column;
+    padding: 2rem 1rem;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 body::before {
@@ -88,6 +89,7 @@ h1, h2, h3, .auth-brand__title {
 .auth-card { 
     width: 100%; 
     max-width: 460px; 
+    margin: auto;
     background: var(--surface); 
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
