@@ -25,16 +25,16 @@ include 'includes/sidebar.php';
         <!-- Create Ticket Form -->
         <div class="card" style="margin-bottom: 20px;">
             <h3 class="card-title">Open a New Ticket</h3>
-            <form id="createTicketForm" style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 200px;">
+            <form id="createTicketForm" class="form-grid">
+                <div class="form-group" style="grid-column: span 2;">
                     <label>Subject</label>
                     <input type="text" id="subject" required placeholder="What is the issue?">
                 </div>
-                <div style="flex: 2; min-width: 300px;">
+                <div class="form-group" style="grid-column: span 2;">
                     <label>Description</label>
                     <input type="text" id="description" required placeholder="Provide details...">
                 </div>
-                <div style="width: 150px;">
+                <div class="form-group">
                     <label>Priority</label>
                     <select id="priority">
                         <option value="low">Low</option>
@@ -43,7 +43,9 @@ include 'includes/sidebar.php';
                         <option value="urgent">Urgent</option>
                     </select>
                 </div>
-                <button type="submit" class="btn" style="padding: 9px 20px; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color);">Submit Ticket</button>
+                <div class="form-group" style="justify-content: flex-end;">
+                    <button type="submit" class="btn" style="width: 100%;">Submit Ticket</button>
+                </div>
             </form>
             <div id="ticketMessage" style="margin-top: 10px;"></div>
         </div>

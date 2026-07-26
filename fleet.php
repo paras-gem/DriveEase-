@@ -23,32 +23,34 @@ include 'includes/sidebar.php';
     <div class="content-grid">
         <div class="card" style="grid-column: span 2;">
             <h3 class="card-title">Add New Vehicle</h3>
-            <form id="addVehicleForm" style="display: grid; gap: 10px; grid-template-columns: repeat(6, 1fr); align-items: end;">
-                <div>
+            <form id="addVehicleForm" class="form-grid">
+                <div class="form-group">
                     <label>Year</label>
                     <select id="car_year" required>
                         <option value="" disabled selected>Loading...</option>
                     </select>
                 </div>
-                <div>
+                <div class="form-group">
                     <label>Make</label>
                     <select id="car_make" required disabled>
                         <option value="" disabled selected>Select Year First</option>
                     </select>
                 </div>
-                <div>
+                <div class="form-group">
                     <label>Model</label>
                     <select id="car_model" required disabled>
                         <option value="" disabled selected>Select Make First</option>
                     </select>
                 </div>
-                <div>
+                <div class="form-group">
                     <label>Trim</label>
                     <select id="car_trim" required disabled>
                         <option value="" disabled selected>Select Model First</option>
                     </select>
                 </div>
-                <button type="submit" class="btn" style="padding: 10px; height: 35px; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); grid-column: span 2;">Add Vehicle</button>
+                <div class="form-submit-row">
+                    <button type="submit" class="btn">Add Vehicle</button>
+                </div>
             </form>
             <div id="formMessage" style="margin-top: 10px;"></div>
         </div>

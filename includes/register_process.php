@@ -78,17 +78,16 @@ try {
         // Hash the password
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-        // Prepare the INSERT statement for the new employee record
+        // Prepare the INSERT statement
         $insertStmt = $pdo->prepare('
-            INSERT INTO employees (name, email, password)
-            VALUES (:name, :email, :password)
+            INSERT INTO employees (name, email, password, role)
+            VALUES (:name, :email, :password, :role)
         ');
-
-        // Execute the query
         $insertStmt->execute([
             'name'     => $fullname,
             'email'    => $email,
-            'password' => $hashed_password
+            'password' => $hashed_password,
+            'role'     => 'support'
         ]);
         
     } else {
