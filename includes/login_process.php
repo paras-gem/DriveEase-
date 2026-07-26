@@ -107,7 +107,8 @@ try {
             ob_end_clean();
             // In Google flow we can either redirect directly (if traditional form) or return JSON
             // We'll return JSON because we will intercept it with AJAX.
-            echo json_encode(['success' => true, 'message' => 'Google Login successful!']);
+            $_SESSION['role'] = 'customer';
+            echo json_encode(['success' => true, 'message' => 'Google Login successful!', 'redirect' => 'dashboard.php']);
             exit;
         }
 
@@ -137,7 +138,7 @@ try {
                 $_SESSION['role'] = 'employee';
                 
                 ob_end_clean();
-                echo json_encode(['success' => true, 'message' => 'Employee login successful! Redirecting...']);
+                echo json_encode(['success' => true, 'message' => 'Employee login successful! Redirecting...', 'redirect' => 'employee-dashboard.php']);
                 exit;
             }
 
@@ -157,7 +158,7 @@ try {
                 $_SESSION['role'] = 'customer';
                 
                 ob_end_clean();
-                echo json_encode(['success' => true, 'message' => 'Login successful! Redirecting...']);
+                echo json_encode(['success' => true, 'message' => 'Login successful! Redirecting...', 'redirect' => 'dashboard.php']);
                 exit;
             }
 

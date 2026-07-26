@@ -138,7 +138,7 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = 'dashboard.php';
+                    window.location.href = data.redirect || 'dashboard.php';
                 } else {
                     document.getElementById('ajaxAlert').style.display = 'block';
                     document.getElementById('ajaxAlert').className = 'auth-alert auth-alert--error';
@@ -213,7 +213,7 @@
                     alertBox.classList.add('auth-alert--success');
                     // On success, quickly redirect to the dashboard
                     setTimeout(() => {
-                        window.location.href = 'dashboard.php';
+                        window.location.href = data.redirect || 'dashboard.php';
                     }, 800);
                 } else {
                     // Show error, re-enable button

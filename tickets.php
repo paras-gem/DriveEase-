@@ -255,8 +255,14 @@ document.getElementById('addCommentForm').addEventListener('submit', function(e)
     });
 });
 
-// Initial fetch
+// Initial fetch with a visible recovery state if the network request never settles.
 loadTickets();
+setTimeout(() => {
+    const tbody = document.getElementById('ticketsTableBody');
+    if (tbody && tbody.textContent.trim() === 'Loading tickets...') {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#dc2626; padding:20px;">Ticket loading timed out. Please refresh and try again.</td></tr>';
+    }
+}, 12000);
 </script>
 
 <!-- Comments Modal -->

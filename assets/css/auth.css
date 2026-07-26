@@ -258,3 +258,9 @@ h1, h2, h3, .auth-brand__title {
     .auth-card { padding: 40px 24px; }
     .auth-brand__title { font-size: 28px; }
 }
+
+/* Unified authentication experience */
+body{background:radial-gradient(circle at 12% 15%,rgba(99,102,241,.24),transparent 30%),radial-gradient(circle at 88% 85%,rgba(168,85,247,.2),transparent 32%),var(--bg-gradient)}
+.auth-card{max-width:500px;padding:44px 48px;background:color-mix(in srgb,var(--surface-solid) 78%,transparent);border:1px solid color-mix(in srgb,var(--accent) 18%,var(--border));box-shadow:0 24px 60px rgba(49,46,129,.16)}
+.auth-brand::before{content:'DE';display:grid;place-items:center;width:48px;height:48px;margin:0 auto 18px;border-radius:15px;background:var(--accent-gradient);color:#fff;font:800 15px Outfit,sans-serif;letter-spacing:.06em;box-shadow:0 10px 22px rgba(99,102,241,.32)}
+.auth-brand__title{font-size:34px}.auth-form{gap:17px}.form-group label{letter-spacing:.01em}.auth-input{min-height:50px}.role-tab{border-radius:10px!important;margin:3px}.auth-footer{padding-top:4px}@media(max-width:520px){.auth-card{padding:36px 24px}.theme-toggle{top:14px;right:14px}}
