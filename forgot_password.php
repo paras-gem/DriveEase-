@@ -19,7 +19,7 @@ $resetError = isset($_GET['error']) ? (int) $_GET['error'] : 0;
     <meta name="description" content="Reset your DriveEase Support account password.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/auth.css?v=<?php echo time(); ?>">
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');</script>
 </head>
 <body>

@@ -12,13 +12,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account — DriveEase Support</title>
+    <title>Create Account — DriveEase (Updated)</title>
     <meta name="description" content="Create a DriveEase Support account to submit and track tickets.">
     <!-- Load required Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Link to our fully redesigned auth CSS -->
-    <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/auth.css?v=<?php echo time(); ?>">
     <!-- Apply theme before body load to prevent flickering -->
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');</script>
 </head>
@@ -43,9 +43,9 @@
         <div id="ajaxAlert" class="auth-alert" style="display: none;" role="alert"></div>
 
         <!-- Role Toggle -->
-        <div style="display: flex; background: var(--input-bg); border-radius: var(--r-sm); overflow: hidden; margin-bottom: 24px; border: 1px solid var(--border);">
-            <button type="button" id="roleCustomer" class="role-tab active" onclick="setRole('customer')" style="flex: 1; padding: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.3s; font-family: 'Inter', sans-serif; background: var(--accent-gradient); color: #fff;">Customer</button>
-            <button type="button" id="roleEmployee" class="role-tab" onclick="setRole('employee')" style="flex: 1; padding: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.3s; font-family: 'Inter', sans-serif; background: transparent; color: var(--txt-2);">Employee</button>
+        <div class="role-toggle-container">
+            <button type="button" id="roleCustomer" class="role-tab active" onclick="setRole('customer')">Customer</button>
+            <button type="button" id="roleEmployee" class="role-tab" onclick="setRole('employee')">Employee</button>
         </div>
 
         <!-- Signup form: default action prevented via JS, submitted via AJAX -->
@@ -167,21 +167,17 @@
             const saInput = document.getElementById('security_answer');
             
             if (role === 'employee') {
-                empBtn.style.background = 'var(--accent-gradient)';
-                empBtn.style.color = '#fff';
-                custBtn.style.background = 'transparent';
-                custBtn.style.color = 'var(--txt-2)';
+                empBtn.classList.add('active');
+                custBtn.classList.remove('active');
                 sqGroup.style.display = 'none';
                 saGroup.style.display = 'none';
                 sqInput.removeAttribute('required');
                 saInput.removeAttribute('required');
             } else {
-                custBtn.style.background = 'var(--accent-gradient)';
-                custBtn.style.color = '#fff';
-                empBtn.style.background = 'transparent';
-                empBtn.style.color = 'var(--txt-2)';
-                sqGroup.style.display = 'grid';
-                saGroup.style.display = 'grid';
+                custBtn.classList.add('active');
+                empBtn.classList.remove('active');
+                sqGroup.style.display = 'flex';
+                saGroup.style.display = 'flex';
                 sqInput.setAttribute('required', 'required');
                 saInput.setAttribute('required', 'required');
             }
