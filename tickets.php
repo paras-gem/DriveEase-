@@ -76,7 +76,7 @@ const currentUserId = <?php echo $_SESSION['user_id']; ?>;
 function loadTickets() {
     const ticketRequest = new AbortController();
     const ticketTimeout = setTimeout(() => ticketRequest.abort(), 12000);
-    fetch('api/tickets.php', { signal: ticketRequest.signal })
+    fetch(`api/tickets.php?refresh=${Date.now()}`, { signal: ticketRequest.signal, cache: 'no-store' })
         .then(response => response.text())
         .then(text => {
             clearTimeout(ticketTimeout);
