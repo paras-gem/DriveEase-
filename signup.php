@@ -42,6 +42,12 @@
         <!-- Alert Container: Used by AJAX to display error/success messages dynamically -->
         <div id="ajaxAlert" class="auth-alert" style="display: none;" role="alert"></div>
 
+        <!-- Role Toggle -->
+        <div style="display: flex; background: var(--input-bg); border-radius: var(--r-sm); overflow: hidden; margin-bottom: 24px; border: 1px solid var(--border);">
+            <button type="button" id="roleCustomer" class="role-tab active" onclick="setRole('customer')" style="flex: 1; padding: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.3s; font-family: 'Inter', sans-serif; background: var(--accent-gradient); color: #fff;">Customer</button>
+            <button type="button" id="roleEmployee" class="role-tab" onclick="setRole('employee')" style="flex: 1; padding: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.3s; font-family: 'Inter', sans-serif; background: transparent; color: var(--txt-2);">Employee</button>
+        </div>
+
         <!-- Signup form: default action prevented via JS, submitted via AJAX -->
         <form class="auth-form" id="signupForm" novalidate>
 
@@ -77,7 +83,7 @@
             </div>
 
             <!-- Security question -->
-            <div class="form-group">
+            <div class="form-group" id="securityQuestionGroup">
                 <label for="security_question">Security question</label>
                 <select class="auth-input" id="security_question" name="security_question" required>
                     <option value="" disabled selected>Choose a question…</option>
@@ -90,7 +96,7 @@
             </div>
 
             <!-- Security answer -->
-            <div class="form-group">
+            <div class="form-group" id="securityAnswerGroup">
                 <label for="security_answer">Your answer</label>
                 <input class="auth-input" type="text" id="security_answer" name="security_answer"
                        placeholder="Answer to the question above" autocomplete="off" required>
@@ -148,6 +154,40 @@
         });
 
         // ----------------------------------------------------
+        // 2.5 Role Selection Toggle
+        // ----------------------------------------------------
+        let currentRole = 'customer';
+        window.setRole = function(role) {
+            currentRole = role;
+            const custBtn = document.getElementById('roleCustomer');
+            const empBtn = document.getElementById('roleEmployee');
+            const sqGroup = document.getElementById('securityQuestionGroup');
+            const saGroup = document.getElementById('securityAnswerGroup');
+            const sqInput = document.getElementById('security_question');
+            const saInput = document.getElementById('security_answer');
+            
+            if (role === 'employee') {
+                empBtn.style.background = 'var(--accent-gradient)';
+                empBtn.style.color = '#fff';
+                custBtn.style.background = 'transparent';
+                custBtn.style.color = 'var(--txt-2)';
+                sqGroup.style.display = 'none';
+                saGroup.style.display = 'none';
+                sqInput.removeAttribute('required');
+                saInput.removeAttribute('required');
+            } else {
+                custBtn.style.background = 'var(--accent-gradient)';
+                custBtn.style.color = '#fff';
+                empBtn.style.background = 'transparent';
+                empBtn.style.color = 'var(--txt-2)';
+                sqGroup.style.display = 'grid';
+                saGroup.style.display = 'grid';
+                sqInput.setAttribute('required', 'required');
+                saInput.setAttribute('required', 'required');
+            }
+        };
+
+        // ----------------------------------------------------
         // 3. AJAX Form Submission
         // ----------------------------------------------------
         const signupForm = document.getElementById('signupForm');
@@ -170,6 +210,7 @@
 
             // Gather form data using FormData API
             const formData = new FormData(signupForm);
+            formData.append('role', currentRole);
 
             // Execute the AJAX request using Fetch API
             fetch('includes/register_process.php', {

@@ -29,7 +29,14 @@ $resetError = isset($_GET['error']) ? (int) $_GET['error'] : 0;
         <span id="toggleLabel">Dark</span>
     </button>
 
-    <div class="auth-card" role="main">
+    <main class="auth-layout">
+        <section class="auth-aside">
+            <span class="auth-kicker">DRIVEEASE</span>
+            <h1>Password recovery made easy.</h1>
+            <p>Get back into your account securely to continue your journey and manage your support requests.</p>
+            <div class="auth-aside__meta">Secure account access</div>
+        </section>
+        <div class="auth-card" role="main">
         <div class="step-indicator" aria-label="Password reset progress">
             <div class="step completed" id="step1">
                 <div class="step__dot">✓</div>
@@ -91,6 +98,7 @@ $resetError = isset($_GET['error']) ? (int) $_GET['error'] : 0;
 
         <div class="auth-footer">Remembered it? <a href="login.php">Sign in</a></div>
     </div>
+    </main>
 
     <script>
     (function () {

@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // 5. Collect and sanitize input data
+$role              = $_POST['role'] ?? 'customer';
 $fullname          = trim($_POST['fullname'] ?? '');
 $email             = trim($_POST['email'] ?? '');
 $password          = trim($_POST['password'] ?? '');
@@ -33,8 +34,13 @@ $security_question = trim($_POST['security_question'] ?? '');
 $security_answer   = trim($_POST['security_answer'] ?? '');
 
 // 6. Validate inputs (check for empty fields)
-if (empty($fullname) || empty($email) || empty($password) || empty($security_question) || empty($security_answer)) {
+if (empty($fullname) || empty($email) || empty($password)) {
     echo json_encode(['success' => false, 'message' => 'Please fill in all required fields.']);
+    exit;
+}
+
+if ($role === 'customer' && (empty($security_question) || empty($security_answer))) {
+    echo json_encode(['success' => false, 'message' => 'Please fill in security question and answer.']);
     exit;
 }
 
@@ -45,33 +51,60 @@ if ($password !== $confirm_password) {
 }
 
 try {
-    // 8. Check email uniqueness (prevent duplicate registrations)
-    $stmt = $pdo->prepare('SELECT id FROM customers WHERE email = :email');
-    $stmt->execute(['email' => $email]);
-    if ($stmt->fetch()) {
-        // If an ID is returned, the email is already in the database
-        echo json_encode(['success' => false, 'message' => 'That email is already registered.']);
-        exit;
+    // 8. Handle registration based on role
+    if ($role === 'employee') {
+        // Check email uniqueness (prevent duplicate registrations)
+        $stmt = $pdo->prepare('SELECT id FROM employees WHERE email = :email');
+        $stmt->execute(['email' => $email]);
+        if ($stmt->fetch()) {
+            echo json_encode(['success' => false, 'message' => 'That email is already registered as an employee.']);
+            exit;
+        }
+
+        // Hash the password
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+
+        // Prepare the INSERT statement for the new employee record
+        $insertStmt = $pdo->prepare('
+            INSERT INTO employees (name, email, password)
+            VALUES (:name, :email, :password)
+        ');
+
+        // Execute the query
+        $insertStmt->execute([
+            'name'     => $fullname,
+            'email'    => $email,
+            'password' => $hashed_password
+        ]);
+        
+    } else {
+        // Check email uniqueness (prevent duplicate registrations)
+        $stmt = $pdo->prepare('SELECT id FROM customers WHERE email = :email');
+        $stmt->execute(['email' => $email]);
+        if ($stmt->fetch()) {
+            echo json_encode(['success' => false, 'message' => 'That email is already registered.']);
+            exit;
+        }
+
+        // Hash the password and security answer securely using BCRYPT
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+        $hashed_answer   = password_hash($security_answer, PASSWORD_BCRYPT);
+
+        // Prepare the INSERT statement for the new user record
+        $insertStmt = $pdo->prepare('
+            INSERT INTO customers (name, email, password, security_question, security_answer)
+            VALUES (:name, :email, :password, :security_question, :security_answer)
+        ');
+
+        // Execute the query with the sanitized and hashed data
+        $insertStmt->execute([
+            'name'              => $fullname,
+            'email'             => $email,
+            'password'          => $hashed_password,
+            'security_question' => $security_question,
+            'security_answer'   => $hashed_answer
+        ]);
     }
-
-    // 9. Hash the password and security answer securely using BCRYPT
-    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-    $hashed_answer   = password_hash($security_answer, PASSWORD_BCRYPT);
-
-    // 10. Prepare the INSERT statement for the new user record
-    $insertStmt = $pdo->prepare('
-        INSERT INTO customers (name, email, password, security_question, security_answer)
-        VALUES (:name, :email, :password, :security_question, :security_answer)
-    ');
-
-    // 11. Execute the query with the sanitized and hashed data
-    $insertStmt->execute([
-        'name'              => $fullname,
-        'email'             => $email,
-        'password'          => $hashed_password,
-        'security_question' => $security_question,
-        'security_answer'   => $hashed_answer
-    ]);
 
     // 12. Send a success response back to the AJAX handler
     echo json_encode(['success' => true, 'message' => 'Account created successfully!']);

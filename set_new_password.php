@@ -55,7 +55,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <span id="toggleLabel">Dark</span>
     </button>
 
-    <div class="auth-card" role="main">
+    <main class="auth-layout">
+        <section class="auth-aside">
+            <span class="auth-kicker">DRIVEEASE</span>
+            <h1>Secure your account.</h1>
+            <p>Set a new, strong password to keep your bookings and support requests protected.</p>
+            <div class="auth-aside__meta">Your security matters</div>
+        </section>
+        <div class="auth-card" role="main">
         <div class="step-indicator" aria-label="Password reset progress">
             <div class="step completed">
                 <div class="step__dot">✓</div>
@@ -102,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="auth-footer"><a href="login.php">Back to sign in</a></div>
     </div>
+    </main>
 
     <script>
     (function () {
