@@ -20,7 +20,7 @@ define('BASE_URL', 'https://driveease-portal.free.je/');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Use relative path to ensure local CSS is loaded instead of the remote production CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">      
+    <link rel="stylesheet" href="assets/css/style.css?v=3">      
     <script>
         // Apply theme early to prevent flash
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');

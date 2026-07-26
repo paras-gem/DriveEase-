@@ -24,18 +24,29 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// 4.5 Auto-create employees table if missing
+// 4.5 Ensure employees table exists with the correct schema (including password for auth)
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS `employees` (
-        `id`         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        `name`       VARCHAR(150)  NOT NULL,
-        `email`      VARCHAR(255)  NOT NULL UNIQUE,
-        `password`   VARCHAR(255)  NOT NULL,
-        `role`       ENUM('admin','support','manager') DEFAULT 'support',
-        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        `name`        VARCHAR(150)  NOT NULL,
+        `email`       VARCHAR(255)  NOT NULL UNIQUE,
+        `password`    VARCHAR(255)  NOT NULL DEFAULT '',
+        `role`        VARCHAR(100)  DEFAULT 'staff',
+        `phone`       VARCHAR(20)   DEFAULT NULL,
+        `salary`      DECIMAL(10,2) DEFAULT 0.00,
+        `status`      ENUM('active','on_leave','terminated') DEFAULT 'active',
+        `joined_date` DATE          DEFAULT (CURRENT_DATE),
+        `created_at`  TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    // If table already existed without password column, add it
+    try {
+        $pdo->exec("ALTER TABLE `employees` ADD COLUMN `password` VARCHAR(255) NOT NULL DEFAULT '' AFTER `email`");
+    } catch (PDOException $ae) {
+        // Column already exists — that's fine, ignore
+    }
 } catch (Exception $e) {
-    // Ignore, let it fail on insert if there's a real issue
+    // Ignore table creation errors, will fail on insert if truly broken
 }
 
 // 5. Collect and sanitize input data
@@ -78,7 +89,7 @@ try {
         // Hash the password
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-        // Prepare the INSERT statement
+        // INSERT — matches actual employees table schema
         $insertStmt = $pdo->prepare('
             INSERT INTO `employees` (`name`, `email`, `password`, `role`)
             VALUES (:name, :email, :password, :role)
@@ -87,9 +98,8 @@ try {
             'name'     => $fullname,
             'email'    => $email,
             'password' => $hashed_password,
-            'role'     => 'support'
+            'role'     => 'staff'
         ]);
-        
     } else {
         // Check email uniqueness (prevent duplicate registrations)
         $stmt = $pdo->prepare('SELECT id FROM customers WHERE email = :email');
