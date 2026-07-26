@@ -6,7 +6,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- 1. CUSTOMERS
-CREATE TABLE `customers` (
+CREATE TABLE IF NOT EXISTS `customers` (
     `id`                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `name`              VARCHAR(150)  NOT NULL,
     `email`             VARCHAR(255)  NOT NULL UNIQUE,
@@ -18,7 +18,7 @@ CREATE TABLE `customers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 2. EMPLOYEES
-CREATE TABLE `employees` (
+CREATE TABLE IF NOT EXISTS `employees` (
     `id`         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `name`       VARCHAR(150)  NOT NULL,
     `email`      VARCHAR(255)  NOT NULL UNIQUE,
@@ -30,7 +30,7 @@ CREATE TABLE `employees` (
 -- 3. FLEET
 --    car_api_trim_id  → links to CarAPI for make/model/year/specs
 --    rent_cost_per_day + status → managed by us (CarAPI does not provide these)
-CREATE TABLE `fleet` (
+CREATE TABLE IF NOT EXISTS `fleet` (
     `id`                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `car_api_trim_id`   INT UNSIGNED   DEFAULT NULL,
     `car_api_year`      SMALLINT UNSIGNED DEFAULT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE `fleet` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 4. BOOKINGS
-CREATE TABLE `bookings` (
+CREATE TABLE IF NOT EXISTS `bookings` (
     `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `customer_id` INT UNSIGNED  NOT NULL,
     `fleet_id`    INT UNSIGNED  NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE `bookings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 5. PAYMENTS
-CREATE TABLE `payments` (
+CREATE TABLE IF NOT EXISTS `payments` (
     `id`           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `booking_id`   INT UNSIGNED  NOT NULL,
     `amount`       DECIMAL(10,2) NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE `payments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 6. MAINTENANCE
-CREATE TABLE `maintenance` (
+CREATE TABLE IF NOT EXISTS `maintenance` (
     `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `fleet_id`    INT UNSIGNED  NOT NULL,
     `description` TEXT          NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE `maintenance` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 7. SUPPORT_TICKETS
-CREATE TABLE `support_tickets` (
+CREATE TABLE IF NOT EXISTS `support_tickets` (
     `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `customer_id` INT UNSIGNED  NOT NULL,
     `subject`     VARCHAR(255)  NOT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE `support_tickets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 8. TICKET_COMMENTS
-CREATE TABLE `ticket_comments` (
+CREATE TABLE IF NOT EXISTS `ticket_comments` (
     `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `ticket_id`   INT UNSIGNED  NOT NULL,
     `customer_id` INT UNSIGNED  DEFAULT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE `ticket_comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 9. FEEDBACK
-CREATE TABLE `feedback` (
+CREATE TABLE IF NOT EXISTS `feedback` (
     `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `customer_id` INT UNSIGNED  NOT NULL,
     `type`        ENUM('feedback','feature','issue','help') DEFAULT 'feedback',

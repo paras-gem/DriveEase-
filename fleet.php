@@ -25,26 +25,26 @@ include 'includes/sidebar.php';
             <h3 class="card-title">Add New Vehicle</h3>
             <form id="addVehicleForm" style="display: grid; gap: 10px; grid-template-columns: repeat(6, 1fr); align-items: end;">
                 <div>
-                    <label style="display: block; margin-bottom: 5px;">Year</label>
-                    <select id="car_year" required style="width: 100%; padding: 8px;">
+                    <label>Year</label>
+                    <select id="car_year" required>
                         <option value="" disabled selected>Loading...</option>
                     </select>
                 </div>
                 <div>
-                    <label style="display: block; margin-bottom: 5px;">Make</label>
-                    <select id="car_make" required disabled style="width: 100%; padding: 8px;">
+                    <label>Make</label>
+                    <select id="car_make" required disabled>
                         <option value="" disabled selected>Select Year First</option>
                     </select>
                 </div>
                 <div>
-                    <label style="display: block; margin-bottom: 5px;">Model</label>
-                    <select id="car_model" required disabled style="width: 100%; padding: 8px;">
+                    <label>Model</label>
+                    <select id="car_model" required disabled>
                         <option value="" disabled selected>Select Make First</option>
                     </select>
                 </div>
                 <div>
-                    <label style="display: block; margin-bottom: 5px;">Trim</label>
-                    <select id="car_trim" required disabled style="width: 100%; padding: 8px;">
+                    <label>Trim</label>
+                    <select id="car_trim" required disabled>
                         <option value="" disabled selected>Select Model First</option>
                     </select>
                 </div>

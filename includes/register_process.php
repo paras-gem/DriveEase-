@@ -24,6 +24,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// 4.5 Auto-create employees table if missing
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `employees` (
+        `id`         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        `name`       VARCHAR(150)  NOT NULL,
+        `email`      VARCHAR(255)  NOT NULL UNIQUE,
+        `password`   VARCHAR(255)  NOT NULL,
+        `role`       ENUM('admin','support','manager') DEFAULT 'support',
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+} catch (Exception $e) {
+    // Ignore, let it fail on insert if there's a real issue
+}
+
 // 5. Collect and sanitize input data
 $role              = $_POST['role'] ?? 'customer';
 $fullname          = trim($_POST['fullname'] ?? '');

@@ -27,16 +27,16 @@ include 'includes/sidebar.php';
             <h3 class="card-title">Open a New Ticket</h3>
             <form id="createTicketForm" style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 200px;">
-                    <label style="display: block; margin-bottom: 5px;">Subject</label>
-                    <input type="text" id="subject" required style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;" placeholder="What is the issue?">
+                    <label>Subject</label>
+                    <input type="text" id="subject" required placeholder="What is the issue?">
                 </div>
                 <div style="flex: 2; min-width: 300px;">
-                    <label style="display: block; margin-bottom: 5px;">Description</label>
-                    <input type="text" id="description" required style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;" placeholder="Provide details...">
+                    <label>Description</label>
+                    <input type="text" id="description" required placeholder="Provide details...">
                 </div>
                 <div style="width: 150px;">
-                    <label style="display: block; margin-bottom: 5px;">Priority</label>
-                    <select id="priority" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+                    <label>Priority</label>
+                    <select id="priority">
                         <option value="low">Low</option>
                         <option value="medium" selected>Medium</option>
                         <option value="high">High</option>
@@ -71,34 +71,17 @@ include 'includes/sidebar.php';
 </main>
 
 <script>
-const currentUserId = <?php echo $_SESSION['user_id']; ?>;
+const currentUserId = <?php echo json_encode((int)$_SESSION['user_id']); ?>;
 
 function loadTickets() {
     const ticketRequest = new AbortController();
     const ticketTimeout = setTimeout(() => ticketRequest.abort(), 12000);
     fetch(`api/tickets.php?refresh=${Date.now()}`, { signal: ticketRequest.signal, cache: 'no-store' })
-        .then(response => response.text())
-        .then(text => {
+        .then(response => response.json())
+        .then(data => {
             clearTimeout(ticketTimeout);
             const tbody = document.getElementById('ticketsTableBody');
             tbody.innerHTML = '';
-            
-            // Strip any HTML warnings that InfinityFree may inject before JSON
-            let jsonStr = text;
-            const jsonStart = text.indexOf('[');
-            const jsonStartObj = text.indexOf('{');
-            if (jsonStart === -1 && jsonStartObj === -1) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No tickets found.</td></tr>`;
-                return;
-            }
-            const start = jsonStart !== -1 && (jsonStartObj === -1 || jsonStart < jsonStartObj) ? jsonStart : jsonStartObj;
-            jsonStr = text.substring(start);
-            
-            let data;
-            try { data = JSON.parse(jsonStr); } catch(e) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No tickets found.</td></tr>`;
-                return;
-            }
             
             if (data.error) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Error: ${data.error}</td></tr>`;
@@ -133,7 +116,7 @@ function loadTickets() {
         })
         .catch(err => {
             clearTimeout(ticketTimeout);
-            document.getElementById('ticketsTableBody').innerHTML = `<tr><td colspan="7" style="text-align: center;">No tickets found.</td></tr>`;
+            document.getElementById('ticketsTableBody').innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Failed to load tickets.</td></tr>`;
         });
 }
 
@@ -279,8 +262,8 @@ setTimeout(() => {
         <div id="commentsList" style="flex: 1; overflow-y: auto; margin-bottom: 15px; min-height: 150px;">
         </div>
         <form id="addCommentForm" style="display: flex; gap: 10px;">
-            <input type="text" id="newComment" required placeholder="Type your reply..." style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
-            <button type="submit" class="btn" style="padding: 8px 15px; background: var(--sidebar-hover); color: white; border: none; cursor: pointer;">Send</button>
+            <input type="text" id="newComment" required placeholder="Type your reply..." style="flex: 1;">
+            <button type="submit" class="btn" style="background: var(--sidebar-hover); color: white; border: none; cursor: pointer;">Send</button>
         </form>
     </div>
 </div>
