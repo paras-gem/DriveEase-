@@ -23,7 +23,7 @@
         <span id="toggleLabel">Dark</span>
     </button>
 
-    <div class="auth-card">
+    <main class="auth-layout"><section class="auth-aside"><span class="auth-kicker">DRIVEEASE</span><h1>Support that keeps every trip moving.</h1><p>One calm workspace for bookings, fleet support, and customer conversations.</p><div class="auth-aside__meta">Secure service portal</div></section><div class="auth-card">
         
         <!-- Header -->
         <div class="auth-brand">
@@ -65,10 +65,11 @@
             <div class="auth-alert auth-alert--error" id="googleLoadError" role="alert" style="display:none;">Google sign-in could not load. Please try email and password.</div>
         </div>
 
-        <div class="auth-footer">
+        <div class="auth-footer" id="signupPrompt">
             New here? <a href="signup.php">Create an account</a>
         </div>
     </div>
+    </main>
 
     <script>
     let currentRole = 'customer';
@@ -77,6 +78,7 @@
         const custBtn = document.getElementById('roleCustomer');
         const empBtn = document.getElementById('roleEmployee');
         const socialLogin = document.getElementById('socialLogin');
+        const signupPrompt = document.getElementById('signupPrompt');
         
         if (role === 'employee') {
             empBtn.style.background = 'var(--accent-gradient)';
@@ -84,12 +86,14 @@
             custBtn.style.background = 'transparent';
             custBtn.style.color = 'var(--txt-2)';
             socialLogin.style.display = 'none';
+            signupPrompt.style.display = 'none';
         } else {
             custBtn.style.background = 'var(--accent-gradient)';
             custBtn.style.color = '#fff';
             empBtn.style.background = 'transparent';
             empBtn.style.color = 'var(--txt-2)';
             socialLogin.style.display = 'block';
+            signupPrompt.style.display = 'block';
         }
     }
     </script>

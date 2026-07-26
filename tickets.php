@@ -74,9 +74,12 @@ include 'includes/sidebar.php';
 const currentUserId = <?php echo $_SESSION['user_id']; ?>;
 
 function loadTickets() {
-    fetch('api/tickets.php')
+    const ticketRequest = new AbortController();
+    const ticketTimeout = setTimeout(() => ticketRequest.abort(), 12000);
+    fetch('api/tickets.php', { signal: ticketRequest.signal })
         .then(response => response.text())
         .then(text => {
+            clearTimeout(ticketTimeout);
             const tbody = document.getElementById('ticketsTableBody');
             tbody.innerHTML = '';
             
@@ -129,6 +132,7 @@ function loadTickets() {
             });
         })
         .catch(err => {
+            clearTimeout(ticketTimeout);
             document.getElementById('ticketsTableBody').innerHTML = `<tr><td colspan="7" style="text-align: center;">No tickets found.</td></tr>`;
         });
 }

@@ -30,7 +30,7 @@
         <span id="toggleLabel">Dark</span>
     </button>
 
-    <div class="auth-card" role="main">
+    <main class="auth-layout"><section class="auth-aside"><span class="auth-kicker">DRIVEEASE</span><h1>Simple support starts here.</h1><p>Create your customer account to book vehicles, track requests, and get help when you need it.</p><div class="auth-aside__meta">Built for better journeys</div></section><div class="auth-card" role="main">
 
         <!-- Branding Header -->
         <div class="auth-brand">
@@ -109,6 +109,8 @@
         </div>
 
     </div>
+
+    </main>
 
     <!-- JavaScript block handling Theme, Password Visibility, and AJAX Form Submission -->
     <script>
