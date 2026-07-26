@@ -18,14 +18,24 @@ CREATE TABLE IF NOT EXISTS `customers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 2. EMPLOYEES
+--    password     → bcrypt-hashed, required for login_process.php auth
+--    role         → VARCHAR so 'staff', 'admin', 'manager' etc. all work
+--    phone/salary/status/joined_date → extended HR fields from actual schema
 CREATE TABLE IF NOT EXISTS `employees` (
-    `id`         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `name`       VARCHAR(150)  NOT NULL,
-    `email`      VARCHAR(255)  NOT NULL UNIQUE,
-    `password`   VARCHAR(255)  NOT NULL,
-    `role`       ENUM('admin','support','manager') DEFAULT 'support',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name`        VARCHAR(150)    NOT NULL,
+    `email`       VARCHAR(255)    NOT NULL UNIQUE,
+    `password`    VARCHAR(255)    NOT NULL DEFAULT '',
+    `role`        VARCHAR(100)    DEFAULT 'staff',
+    `phone`       VARCHAR(20)     DEFAULT NULL,
+    `salary`      DECIMAL(10,2)   DEFAULT 0.00,
+    `status`      ENUM('active','on_leave','terminated') DEFAULT 'active',
+    `joined_date` DATE            DEFAULT (CURRENT_DATE),
+    `created_at`  TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- If employees table already exists from old schema (without password), run this:
+-- ALTER TABLE `employees` ADD COLUMN `password` VARCHAR(255) NOT NULL DEFAULT '' AFTER `email`;
 
 -- 3. FLEET
 --    car_api_trim_id  → links to CarAPI for make/model/year/specs

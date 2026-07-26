@@ -50,6 +50,8 @@
 
         <!-- Signup form: default action prevented via JS, submitted via AJAX -->
         <form class="auth-form" id="signupForm" novalidate>
+            <!-- Hidden role field — updated by setRole() when tab is clicked -->
+            <input type="hidden" id="roleField" name="role" value="customer">
 
             <!-- Full name -->
             <div class="form-group">
@@ -159,8 +161,11 @@
         let currentRole = 'customer';
         window.setRole = function(role) {
             currentRole = role;
+            // Directly update the hidden field — most reliable way to send role
+            document.getElementById('roleField').value = role;
+
             const custBtn = document.getElementById('roleCustomer');
-            const empBtn = document.getElementById('roleEmployee');
+            const empBtn  = document.getElementById('roleEmployee');
             const sqGroup = document.getElementById('securityQuestionGroup');
             const saGroup = document.getElementById('securityAnswerGroup');
             const sqInput = document.getElementById('security_question');
@@ -204,9 +209,10 @@
             spinner.style.display = 'block';
             btnText.textContent = 'Creating account…';
 
-            // Gather form data using FormData API
+            // Gather form data — role comes from the hidden #roleField input automatically
             const formData = new FormData(signupForm);
-            formData.append('role', currentRole);
+            // Safety override with formData.set (prevents duplicates)
+            formData.set('role', currentRole);
 
             // Execute the AJAX request using Fetch API
             fetch('includes/register_process.php', {
