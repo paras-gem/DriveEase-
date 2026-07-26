@@ -56,7 +56,13 @@ include 'includes/sidebar.php';
         </div>
 
         <div class="card" style="grid-column: span 2;">
-            <h3 class="card-title">Current Fleet</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <h3 class="card-title" style="margin-bottom: 0;">Current Fleet</h3>
+                <div style="flex: 1; max-width: 400px; position: relative;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+                    <input type="text" id="searchFleet" placeholder="Search fleet by ID, name, or status..." style="padding-left: 45px;">
+                </div>
+            </div>
             <table style="width: 100%; text-align: left; border-collapse: collapse;">
                 <thead>
                     <tr>
@@ -257,6 +263,24 @@ function deleteVehicle(id) {
         alert("Failed to delete vehicle.");
     });
 }
+
+// Client-side search filter
+document.getElementById('searchFleet').addEventListener('keyup', function(e) {
+    const term = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#fleetTableBody tr');
+    let hasVisible = false;
+    rows.forEach(row => {
+        if (row.children.length > 1) { // ignore empty state row
+            const text = row.textContent.toLowerCase();
+            if (text.includes(term)) {
+                row.style.display = '';
+                hasVisible = true;
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    });
+});
 
 // Initial fetch
 fetchFleet();
