@@ -80,7 +80,7 @@ try {
 
         // Prepare the INSERT statement
         $insertStmt = $pdo->prepare('
-            INSERT INTO employees (name, email, password, role)
+            INSERT INTO `employees` (`name`, `email`, `password`, `role`)
             VALUES (:name, :email, :password, :role)
         ');
         $insertStmt->execute([
@@ -105,7 +105,7 @@ try {
 
         // Prepare the INSERT statement for the new user record
         $insertStmt = $pdo->prepare('
-            INSERT INTO customers (name, email, password, security_question, security_answer)
+            INSERT INTO `customers` (`name`, `email`, `password`, `security_question`, `security_answer`)
             VALUES (:name, :email, :password, :security_question, :security_answer)
         ');
 
